@@ -19,6 +19,7 @@ export default defineConfig(({ command, mode }) => {
     define: {
       __APP_ENV__: JSON.stringify(env.APP_ENV),
     },
+    base: MODE === "production" ? "/meeting-minutes/" : "/",
     server: {
       host: HOST,
       port: +PORT,
