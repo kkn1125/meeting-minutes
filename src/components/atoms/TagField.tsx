@@ -1,6 +1,6 @@
 import { Box, Chip, FormHelperText, Stack, TextField } from "@mui/material";
 import { FormikProps } from "formik";
-import { KeyboardEvent, useState } from "react";
+import { FormEvent, KeyboardEvent, useState } from "react";
 import { InitialValues } from "../../model/minutes";
 
 type TagFieldProps = {
@@ -18,23 +18,28 @@ function TagField({ name, formik }: TagFieldProps) {
     );
   }
 
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (
-      (event.key === "Enter" || event.key === "," || event.key === " ") &&
-      inputValue
-    ) {
+  const handleKeyDownDesktop = (event: FormEvent) => {
+    const native = event.nativeEvent as InputEvent;
+    const value = inputValue;
+    if ((native.data === "," || native.data === " ") && value) {
       event.preventDefault();
       event.stopPropagation();
       formik.setFieldValue(name, [
         ...formik.values.participants,
-        { name: inputValue },
+        { name: value.replace(/[,\s]/, "") },
       ]);
-      setInputValue("");
-    }
-    if (event.key === "Backspace") {
-      formik.setFieldValue(name, formik.values.participants.slice(0, -1));
+      setInputValue(() => "");
+    } else {
+      setInputValue(() => (event.target as HTMLInputElement).value);
     }
   };
+
+  function handleKeyDownRemove(e: KeyboardEvent) {
+    const value = inputValue;
+    if (value.length === 0 && e.key === "Backspace") {
+      formik.setFieldValue(name, formik.values.participants.slice(0, -1));
+    }
+  }
 
   return (
     <Stack
@@ -66,8 +71,9 @@ function TagField({ name, formik }: TagFieldProps) {
         ))}
         <TextField
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
+          // onChange={(e) => }
+          onInput={handleKeyDownDesktop}
+          onKeyDown={handleKeyDownRemove}
           placeholder='참여자 이름'
           size='small'
           margin='normal'
