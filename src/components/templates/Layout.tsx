@@ -5,6 +5,7 @@ import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 import DarkModeButton from "../atoms/DarkModeButton";
 import MenuItems from "../moleculars/MenuItems";
 import Footer from "../organisms/Footer";
+import { BASE } from "../../util/global";
 
 type Crumb = {
   name: string;
@@ -37,7 +38,7 @@ function Layout() {
           name: crumbTo[cur],
         });
       } else {
-        acc.push({ to: "/" + cur, name: crumbTo[cur] });
+        acc.push({ to: BASE + cur, name: crumbTo[cur] });
       }
       return acc;
     }, []);

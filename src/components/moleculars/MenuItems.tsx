@@ -22,6 +22,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { DocumentationManager } from "../../model/documentation.manager";
 import { DATA_ACTION, DataDispatchContext } from "../../context/DataProvider";
+import { BASE } from "../../util/global";
 
 function MenuItems() {
   const dataDispatch = useContext(DataDispatchContext);
@@ -123,7 +124,7 @@ function MenuItems() {
                   <MenuItem
                     onClick={(e) => {
                       handleClose(e);
-                      navigate("/meeting-minutes/add");
+                      navigate(`${BASE}meeting-minutes/add`);
                     }}>
                     <ListItemIcon>
                       <GroupsIcon fontSize='small' />
@@ -135,7 +136,7 @@ function MenuItems() {
                   <MenuItem
                     onClick={(e) => {
                       handleClose(e);
-                      navigate("/meeting-minutes");
+                      navigate(`${BASE}meeting-minutes`);
                     }}>
                     <ListItemIcon>
                       <InventoryIcon fontSize='small' />

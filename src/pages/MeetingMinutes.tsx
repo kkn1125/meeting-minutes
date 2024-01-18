@@ -20,6 +20,7 @@ import { DocumentationManager } from "../model/documentation.manager";
 import Minutes, { InitialValues, MinutesType } from "../model/minutes";
 import { format } from "../util/features";
 import { Category } from "../model/documentation";
+import { BASE } from "../util/global";
 
 const docuManager = new DocumentationManager();
 
@@ -95,10 +96,10 @@ function MeetingMinutes() {
 
       if (params.id) {
         docuManager.update(params.id, minutes);
-        navigate(`/meeting-minutes/${params.id}`);
+        navigate(`${BASE}meeting-minutes/${params.id}`);
       } else {
         docuManager.add(minutes);
-        navigate("/");
+        navigate(BASE);
       }
     },
   });

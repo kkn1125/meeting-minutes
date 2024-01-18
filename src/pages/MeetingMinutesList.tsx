@@ -14,6 +14,7 @@ import {
   DataContext,
   DataDispatchContext,
 } from "../context/DataProvider";
+import { BASE } from "../util/global";
 
 function MeetingMinutesList() {
   const docuManager = new DocumentationManager();
@@ -27,7 +28,7 @@ function MeetingMinutesList() {
   }, [data.data, data.version]);
 
   function handleViewer(id: string) {
-    navigate(`/meeting-minutes/view?id=${id}`);
+    navigate(`${BASE}meeting-minutes/view?id=${id}`);
   }
 
   if (minutesList === null) {

@@ -25,6 +25,7 @@ import Minutes from "../model/minutes";
 import { DocumentationManager } from "../model/documentation.manager";
 import ClassIcon from "@mui/icons-material/Class";
 import { format } from "../util/features";
+import { BASE } from "../util/global";
 
 function MeetingMinutesViewer() {
   const navigate = useNavigate();
@@ -37,12 +38,12 @@ function MeetingMinutesViewer() {
     if (minutes) {
       setMinutes(minutes);
     } else {
-      navigate("/");
+      navigate(BASE);
     }
   }, [params.id, docuManager.documentation.version]);
 
   function handleUpdateForm(id: string) {
-    navigate(`/meeting-minutes/update?id=${id}`);
+    navigate(`${BASE}meeting-minutes/update?id=${id}`);
   }
 
   if (minutes === null) {
