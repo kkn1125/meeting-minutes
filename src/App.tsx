@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import MeetingMinutes from "./pages/MeetingMinutes.tsx";
 import MeetingMinutesList from "./pages/MeetingMinutesList.tsx";
 import MeetingMinutesViewer from "./pages/MeetingMinutesViewer.tsx";
+import { BASE } from "./util/global.ts";
 
 function App() {
   const theme = useContext(ThemeContext);
@@ -16,7 +17,7 @@ function App() {
       component='main'
       className={`${theme.mode} text-foreground bg-background`}>
       <Routes>
-        <Route path='' element={<Layout />}>
+        <Route path={BASE} element={<Layout />}>
           <Route path='' element={<Home />} />
           <Route path='meeting-minutes'>
             <Route path='' element={<MeetingMinutesList />}></Route>

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prod": "cross-env NODE_ENV=production vite",
     "build": "rm -rf dist/ && tsc && vite build",
     "create": "mkdir \"dist/meeting-minutes/view\" \"dist/meeting-minutes/add\" \"dist/meeting-minutes/update\"",
     "postbuild": "pnpm run create && cp dist/index.html dist/meeting-minutes/update/ && cp dist/index.html dist/meeting-minutes/view/ && cp dist/index.html dist/meeting-minutes/add/",

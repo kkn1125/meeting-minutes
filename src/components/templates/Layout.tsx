@@ -29,12 +29,15 @@ function Layout() {
 
   useEffect(() => {
     // const crumbs = locate.pathname.split(/\b(?<=\/)|(?=\/)\b/g);
-    const crumbs =
-      locate.pathname === "/" ? [""] : locate.pathname.split(/\//g);
+    const path = locate.pathname.slice(BASE.length - 1);
+    const crumbs = path === "/" ? [""] : path.split(/\//g);
+    if (crumbs.length > 1 && crumbs.at(-1) === "") {
+      crumbs.pop();
+    }
     const crumblist = crumbs.reduce((acc, cur) => {
       if (acc.at(-1)) {
         acc.push({
-          to: (acc.at(-1).to.endsWith("/") ? "" : acc.at(-1).to) + "/" + cur,
+          to: [acc.at(-1).to, "/", cur].join("/").replace(/\/+/g, "/"),
           name: crumbTo[cur],
         });
       } else {
@@ -42,10 +45,13 @@ function Layout() {
       }
       return acc;
     }, []);
+    console.log(crumblist);
+
     if (params.id) {
       crumblist.at(-1).to = crumblist.at(-1).to + "?id=" + params.id;
       crumblist.at(-1).name = crumblist.at(-1).name + " : " + params.id;
     }
+
     setBreadcrumbs(() => crumblist);
   }, [locate.pathname]);
 

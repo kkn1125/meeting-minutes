@@ -32,7 +32,6 @@ function MeetingMinutesViewer() {
   const docuManager = new DocumentationManager();
   const params = Object.fromEntries(useSearchParams()[0].entries());
   const [minutes, setMinutes] = useState<Minutes>(null);
-
   useEffect(() => {
     const minutes = docuManager.findOne(params.id);
     if (minutes) {
