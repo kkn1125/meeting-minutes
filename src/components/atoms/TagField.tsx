@@ -19,7 +19,10 @@ function TagField({ name, formik }: TagFieldProps) {
   }
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key === "Enter" && inputValue) {
+    if (
+      (event.key === "Enter" || event.key === "," || event.key === " ") &&
+      inputValue
+    ) {
       event.preventDefault();
       event.stopPropagation();
       formik.setFieldValue(name, [

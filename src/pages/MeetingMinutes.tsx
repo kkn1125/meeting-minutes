@@ -25,7 +25,7 @@ import { BASE } from "../util/global";
 const docuManager = new DocumentationManager();
 
 const initialValues: InitialValues = {
-  category: "",
+  category: undefined,
   title: "",
   topic: "",
   minutesDate: format(new Date(), "YYYY-MM-ddTHH:mm:ss.SSS"),
@@ -109,7 +109,7 @@ function MeetingMinutes() {
 
   const defaultCategory = useMemo(() => {
     return (
-      formik.values.category ||
+      formik.values.category ??
       docuManager.documentation.categories?.[0]?.inputValue
     );
   }, [formik.values.category]);
@@ -360,17 +360,22 @@ function MeetingMinutes() {
           />
         </Stack>
 
-        <Box>
+        <Stack direction='row'>
           <Button
+            color='success'
+            variant='contained'
             type='submit'
-            className='bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg'
             sx={{
+              flex: {
+                xs: 1,
+                md: 0,
+              },
               color: "white",
               borderRadius: "100px",
             }}>
             {params.id ? "update" : "add"}
           </Button>
-        </Box>
+        </Stack>
       </Stack>
     </Box>
   );

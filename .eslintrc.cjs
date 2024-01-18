@@ -15,5 +15,7 @@ module.exports = {
       { allowConstantExport: true },
     ],
     "@typescript-eslint/no-unused-vars": "off",
+    "react-refresh/only-export-components": "off",
+    "react-hooks/exhaustive-deps": "off",
   },
 };
