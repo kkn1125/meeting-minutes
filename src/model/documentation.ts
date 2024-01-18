@@ -29,6 +29,7 @@ export default class Documentation {
     }
     this.categories = this.save(this.CATEGORY_STORAGE_NAME, this.categories);
   }
+
   removeCategory(index: number) {
     this.categories.splice(index, 1);
     this.categories = this.save(this.CATEGORY_STORAGE_NAME, this.categories);

@@ -81,7 +81,6 @@ function MeetingMinutes() {
     validationSchema,
     validate(values) {
       const errors: Partial<{ [key in keyof InitialValues]: string }> = {};
-      // console.log(values);
       if (values.minutesDate === null) {
         errors.minutesDate = "시간을 표시해주세요.";
       } else if (new Date(values.minutesDate).toString() === "Invalid Date") {
@@ -96,7 +95,7 @@ function MeetingMinutes() {
 
       if (params.id) {
         docuManager.update(params.id, minutes);
-        navigate(`${BASE}meeting-minutes/${params.id}`);
+        navigate(`${BASE}meeting-minutes/view?id=${params.id}`);
       } else {
         docuManager.add(minutes);
         navigate(BASE);
@@ -138,7 +137,10 @@ function MeetingMinutes() {
   }
 
   return (
-    <Box>
+    <Box
+      sx={{
+        m: 5,
+      }}>
       <Typography align='center' fontWeight={700} variant='h4'>
         <Autocomplete
           options={categoryOptions}
@@ -176,7 +178,6 @@ function MeetingMinutes() {
                   if (value.caption.startsWith("Add")) {
                     addCategory(value);
                   }
-                  console.log(value.inputValue);
                   formik.setFieldValue("category", value.inputValue);
                 }
               } else {
@@ -297,7 +298,13 @@ function MeetingMinutes() {
           </Stack>
 
           {/* participants */}
-          <Stack direction='row' justifyContent={"space-between"} gap={3}>
+          <Stack
+            direction={{
+              md: "row",
+              xs: "column",
+            }}
+            justifyContent={"space-between"}
+            gap={3}>
             <DateField name='minutesDate' formik={formik} />
             <Stack direction='row' gap={2} flex={1}>
               {/* stack tags */}
@@ -325,7 +332,12 @@ function MeetingMinutes() {
         <Divider sx={{ my: 2 }} />
 
         {/* content & note */}
-        <Stack direction='row' gap={2}>
+        <Stack
+          direction={{
+            md: "row",
+            xs: "column",
+          }}
+          gap={2}>
           <ContentListField name='contents' formik={formik} />
           <TextField
             placeholder='떠오르는 아이디어를 작성하세요!'

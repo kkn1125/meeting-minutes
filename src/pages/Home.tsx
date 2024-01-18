@@ -4,10 +4,18 @@ import { BASE } from "../util/global";
 
 function Home() {
   return (
-    <Stack>
+    <Stack
+      alignItems={{
+        xs: "center",
+        md: "flex-start",
+      }}>
       <Box
         sx={{
           p: 5,
+          textAlign: {
+            xs: "center",
+            md: "inherit",
+          },
         }}>
         <Typography variant='h3'>Meeting Minutes</Typography>
       </Box>

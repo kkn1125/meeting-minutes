@@ -1,3 +1,4 @@
+import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import {
   List,
   ListItemButton,
@@ -7,13 +8,9 @@ import {
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { DataContext, DataDispatchContext } from "../context/DataProvider";
 import { DocumentationManager } from "../model/documentation.manager";
 import Minutes from "../model/minutes";
-import {
-  DATA_ACTION,
-  DataContext,
-  DataDispatchContext,
-} from "../context/DataProvider";
 import { BASE } from "../util/global";
 
 function MeetingMinutesList() {
@@ -43,24 +40,27 @@ function MeetingMinutesList() {
   }
 
   return (
-    <div>
+    <List
+      component={Stack}
+      gap={1}
+      sx={{
+        m: 5,
+      }}>
       {minutesList.length === 0 && (
         <Typography>등록된 회의록이 없습니다.</Typography>
       )}
-      <List component={Stack} gap={1}>
-        {minutesList.map(({ id, title }) => (
-          <ListItemButton
-            key={id}
-            component={Stack}
-            direction='row'
-            gap={1}
-            onClick={() => handleViewer(id)}>
-            <Typography>{id}</Typography>
-            <Typography>{title}</Typography>
-          </ListItemButton>
-        ))}
-      </List>
-    </div>
+      {minutesList.map(({ id, title }) => (
+        <ListItemButton
+          key={id}
+          component={Stack}
+          direction='row'
+          gap={1}
+          onClick={() => handleViewer(id)}>
+          <InsertDriveFileOutlinedIcon color='info' />
+          <Typography>{title}</Typography>
+        </ListItemButton>
+      ))}
+    </List>
   );
 }
 

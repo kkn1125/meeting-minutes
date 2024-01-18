@@ -10,6 +10,8 @@ import {
   Stack,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import {
@@ -28,6 +30,8 @@ import { format } from "../util/features";
 import { BASE } from "../util/global";
 
 function MeetingMinutesViewer() {
+  const theme = useTheme();
+  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
   const navigate = useNavigate();
   const docuManager = new DocumentationManager();
   const params = Object.fromEntries(useSearchParams()[0].entries());
@@ -45,39 +49,75 @@ function MeetingMinutesViewer() {
     navigate(`${BASE}meeting-minutes/update?id=${id}`);
   }
 
+  function handleRemove(id: string) {
+    if (!confirm("문서를 삭제하면 복구가 불가능합니다. 정말 삭제하시겠습니까?"))
+      return;
+    docuManager.remove(id);
+    navigate(`${BASE}meeting-minutes`);
+  }
+
   if (minutes === null) {
     return (
-      <Stack sx={{}}>
-        <Skeleton width='100%' height='2em' />
-        <Skeleton width='40%' height='2em' />
-      </Stack>
+      <Box
+        sx={{
+          position: "relative",
+          m: 5,
+        }}>
+        <Stack>
+          <Skeleton width='100%' height='2em' />
+          <Skeleton width='40%' height='2em' />
+        </Stack>
+      </Box>
     );
   }
 
   return (
-    <Box>
+    <Box
+      sx={{
+        position: "relative",
+        m: 5,
+      }}>
       <Stack
-        direction='row'
-        justifyContent={"space-between"}
-        alignItems={"center"}
+        direction={{ xs: "column-reverse", md: "row" }}
+        justifyContent={{
+          xs: "flex-start",
+          md: "space-between",
+        }}
+        alignItems={{
+          xs: "flex-start",
+          md: "center",
+        }}
         gap={1}>
         <Stack direction='row' alignItems={"center"} gap={1}>
           <ClassIcon color='error' fontSize='large' />
-          <Typography fontWeight={700} variant='h4'>
+          <Typography fontWeight={700} variant={isMdUp ? "h4" : "h5"}>
             분류:
           </Typography>
-          <Typography fontWeight={700} variant='h4'>
+          <Typography fontWeight={700} variant={isMdUp ? "h4" : "h5"}>
             {minutes.category}
           </Typography>
         </Stack>
-        <Button
-          variant='contained'
-          onClick={() => handleUpdateForm(params.id)}
-          sx={{
-            borderRadius: 100,
-          }}>
-          수정
-        </Button>
+        <Stack direction='row' gap={1}>
+          <Button
+            size={isMdUp ? "medium" : "small"}
+            variant='contained'
+            onClick={() => handleUpdateForm(params.id)}
+            sx={{
+              borderRadius: 100,
+            }}>
+            수정
+          </Button>
+          <Button
+            color='error'
+            size={isMdUp ? "medium" : "small"}
+            variant='contained'
+            onClick={() => handleRemove(params.id)}
+            sx={{
+              borderRadius: 100,
+            }}>
+            삭제
+          </Button>
+        </Stack>
       </Stack>
       <Stack gap={4} sx={{ mt: 3 }}>
         <Stack flex={1} gap={4}>
@@ -170,7 +210,10 @@ function MeetingMinutesViewer() {
         <Divider sx={{ my: 2 }} />
 
         {/* content & note */}
-        <Stack direction='row' justifyContent={"space-between"} gap={3}>
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          justifyContent={"space-between"}
+          gap={3}>
           <Stack flex={1} gap={2}>
             {minutes.contents.map((content, index) => (
               <Typography key={content.item + index} variant='body1'>

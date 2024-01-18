@@ -20,13 +20,11 @@ export enum DATA_ACTION {
 const reducer = (state, action) => {
   switch (action.type) {
     case DATA_ACTION.LOAD:
-      console.log("reload", docuManager.findAll());
       return {
         data: docuManager.findAll(),
         version: state.version + 1,
       };
     case DATA_ACTION.CB:
-      console.log("cb", docuManager.findAll());
       action.cb();
       return { ...state, version: state.version + 1 };
     default:

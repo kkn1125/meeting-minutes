@@ -1,5 +1,13 @@
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import { Box, Breadcrumbs, Paper, Stack } from "@mui/material";
+import {
+  Box,
+  Breadcrumbs,
+  Paper,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 import DarkModeButton from "../atoms/DarkModeButton";
@@ -21,6 +29,8 @@ const crumbTo = {
 };
 
 function Layout() {
+  const theme = useTheme();
+  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
   const locate = useLocation();
   const params = Object.fromEntries(
     new URLSearchParams(locate.search).entries()
@@ -28,30 +38,22 @@ function Layout() {
   const [breadcrumbs, setBreadcrumbs] = useState<Crumb[]>([]);
 
   useEffect(() => {
-    // const crumbs = locate.pathname.split(/\b(?<=\/)|(?=\/)\b/g);
-    const path = locate.pathname.slice(BASE.length - 1);
-    const crumbs = path === "/" ? [""] : path.split(/\//g);
-    if (crumbs.length > 1 && crumbs.at(-1) === "") {
-      crumbs.pop();
-    }
-    const crumblist = crumbs.reduce((acc, cur) => {
-      if (acc.at(-1)) {
+    const path = locate.pathname.slice(BASE.length);
+    const crumbs = path.split(/\/+/g).filter((_) => _);
+    const crumblist = crumbs.reduce(
+      (acc, cur, index) => {
         acc.push({
-          to: [acc.at(-1).to, "/", cur].join("/").replace(/\/+/g, "/"),
+          to: BASE + crumbs.slice(0, index + 1).join("/"),
           name: crumbTo[cur],
         });
-      } else {
-        acc.push({ to: BASE + cur, name: crumbTo[cur] });
-      }
-      return acc;
-    }, []);
-    console.log(crumblist);
-
+        return acc;
+      },
+      [{ to: BASE, name: "HOME" }]
+    );
     if (params.id) {
       crumblist.at(-1).to = crumblist.at(-1).to + "?id=" + params.id;
       crumblist.at(-1).name = crumblist.at(-1).name + " : " + params.id;
     }
-
     setBreadcrumbs(() => crumblist);
   }, [locate.pathname]);
 
@@ -62,6 +64,7 @@ function Layout() {
         sx={{
           mx: 5,
           my: 2,
+          zIndex: 5,
         }}>
         <Stack
           direction='row'
@@ -71,9 +74,15 @@ function Layout() {
             separator={<NavigateNextIcon fontSize='small' />}
             aria-label='breadcrumb'>
             {breadcrumbs.map(({ name, to }, index) => (
-              <Link key={index} to={to}>
+              <Typography
+                component={Link}
+                key={index}
+                to={to}
+                fontSize={(theme) =>
+                  theme.typography.pxToRem(isMdUp ? 16 : 10)
+                }>
                 {name}
-              </Link>
+              </Typography>
             ))}
           </Breadcrumbs>
           <Stack direction='row' alignItems='center' gap={2}>
@@ -93,8 +102,10 @@ function Layout() {
           sx={{
             my: 5,
             mx: "auto",
-            width: "60%",
-            p: 5,
+            width: {
+              md: "60%",
+              xs: "90%",
+            },
           }}>
           <Outlet />
         </Paper>

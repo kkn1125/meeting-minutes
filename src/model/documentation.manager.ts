@@ -17,6 +17,9 @@ export class DocumentationManager {
   update(id: string, minutes: Minutes) {
     this.documentation.update(id, minutes);
   }
+  remove(id: string) {
+    this.documentation.remove(id);
+  }
   saveAll() {
     this.documentation.saveAll();
   }

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "prod": "cross-env NODE_ENV=production vite",
-    "build": "rm -rf dist/ && tsc && vite build",
+    "build": "rm -rf dist/ && tsc && cross-env NODE_ENV=production vite build",
     "create": "mkdir \"dist/meeting-minutes/view\" \"dist/meeting-minutes/add\" \"dist/meeting-minutes/update\"",
     "postbuild": "pnpm run create && cp dist/index.html dist/meeting-minutes/update/ && cp dist/index.html dist/meeting-minutes/view/ && cp dist/index.html dist/meeting-minutes/add/",
     "deploy": "pnpm build && touch dist/.nojekyll && cd dist/ && git init && git add -A && git commit -m \"gh-pages\" && git push https://github.com/kkn1125/meeting-minutes.git master:gh-pages -f",
