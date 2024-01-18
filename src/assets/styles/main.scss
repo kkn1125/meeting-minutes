@@ -9,12 +9,10 @@ body,
 }
 
 #root {
-  & > div[data-overlay-container] {
-    &,
-    main {
-      height: 100%;
-      margin: 0;
-      overflow: hidden;
-    }
+  &,
+  main {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
   }
 }

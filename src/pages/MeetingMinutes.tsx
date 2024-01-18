@@ -110,7 +110,7 @@ function MeetingMinutes() {
   const defaultCategory = useMemo(() => {
     return (
       formik.values.category ||
-      docuManager.documentation.categories[0].inputValue
+      docuManager.documentation.categories?.[0]?.inputValue
     );
   }, [formik.values.category]);
 

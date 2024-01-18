@@ -78,9 +78,11 @@ function Layout() {
                 component={Link}
                 key={index}
                 to={to}
-                fontSize={(theme) =>
-                  theme.typography.pxToRem(isMdUp ? 16 : 10)
-                }>
+                fontSize={(theme) => theme.typography.pxToRem(isMdUp ? 16 : 10)}
+                color={(theme) => theme.palette.text.primary}
+                sx={{
+                  textDecoration: "none",
+                }}>
                 {name}
               </Typography>
             ))}
