@@ -10,16 +10,16 @@ import {
   createFilterOptions,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { MouseEvent, useEffect, useMemo, useRef } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useMemo, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import ContentListField from "../components/atoms/ContentListField";
 import DateField from "../components/atoms/DateField";
 import TagField from "../components/atoms/TagField";
+import { Category } from "../model/documentation";
 import { DocumentationManager } from "../model/documentation.manager";
 import Minutes, { InitialValues, MinutesType } from "../model/minutes";
 import { format } from "../util/features";
-import { Category } from "../model/documentation";
 import { BASE } from "../util/global";
 
 const docuManager = new DocumentationManager();

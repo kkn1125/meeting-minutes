@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DataContext, DataDispatchContext } from "../context/DataProvider";
+import { DataContext } from "../context/DataProvider";
 import { DocumentationManager } from "../model/documentation.manager";
 import Minutes from "../model/minutes";
 import { BASE } from "../util/global";

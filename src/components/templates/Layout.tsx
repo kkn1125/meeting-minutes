@@ -10,13 +10,13 @@ import {
   useTheme,
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import { Link, Outlet, useLocation, useParams } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
+import { DATA_ACTION, DataDispatchContext } from "../../context/DataProvider";
+import { DocumentationManager } from "../../model/documentation.manager";
+import { BASE } from "../../util/global";
 import DarkModeButton from "../atoms/DarkModeButton";
 import MenuItems from "../moleculars/MenuItems";
 import Footer from "../organisms/Footer";
-import { BASE } from "../../util/global";
-import { DocumentationManager } from "../../model/documentation.manager";
-import { DATA_ACTION, DataDispatchContext } from "../../context/DataProvider";
 
 declare global {
   interface Window {
@@ -73,7 +73,7 @@ function Layout() {
           dataDispatch({
             type: DATA_ACTION.LOAD,
           });
-          alert('등록이 완료되었습니다.')
+          alert("등록이 완료되었습니다.");
         });
       } else {
         alert("지원되지 않는 파일 타입입니다.");

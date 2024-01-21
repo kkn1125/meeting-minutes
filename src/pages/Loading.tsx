@@ -1,5 +1,4 @@
-import { Box, CircularProgress, Stack } from "@mui/material";
-import React from "react";
+import { CircularProgress, Stack } from "@mui/material";
 
 function Loading() {
   return (

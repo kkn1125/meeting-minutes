@@ -1,31 +1,19 @@
+import ClassIcon from "@mui/icons-material/Class";
 import {
-  Autocomplete,
   Box,
   Button,
   Chip,
-  CircularProgress,
   Divider,
-  IconButton,
   Skeleton,
   Stack,
-  TextField,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
-import ContentListField from "../components/atoms/ContentListField";
-import DateField from "../components/atoms/DateField";
-import { Category } from "../model/documentation";
-import Minutes from "../model/minutes";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { DocumentationManager } from "../model/documentation.manager";
-import ClassIcon from "@mui/icons-material/Class";
+import Minutes from "../model/minutes";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
 

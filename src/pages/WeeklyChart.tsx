@@ -2,21 +2,21 @@
 // TODO: 카카오톡 저장하기 기능 추가
 
 import { Button, Chip, Stack, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { Bar, Chart } from "react-chartjs-2";
 import {
-  Chart as ChartJS,
   ArcElement,
-  Tooltip,
-  Legend,
+  BarController,
   BarElement,
   CategoryScale,
+  Chart as ChartJS,
+  Legend,
   LinearScale,
-  BarController,
+  Tooltip,
 } from "chart.js";
-import { format } from "../util/features";
+import { useEffect, useState } from "react";
+import { Chart } from "react-chartjs-2";
 import { DocumentationManager } from "../model/documentation.manager";
 import Minutes from "../model/minutes";
+import { format } from "../util/features";
 
 ChartJS.register(
   ArcElement,
