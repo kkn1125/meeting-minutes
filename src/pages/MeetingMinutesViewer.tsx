@@ -132,7 +132,7 @@ function MeetingMinutesViewer() {
                   position: "absolute",
                   bottom: "calc(100% - 0.1em)",
                   left: 0,
-                  content: "'title'",
+                  content: "'주제'",
                   textTransform: "uppercase",
                   color: (theme) => theme.palette.text.disabled,
                   fontSize: (theme) => theme.typography.pxToRem(12),
@@ -141,30 +141,31 @@ function MeetingMinutesViewer() {
               {minutes.title}
             </Typography>
             <Typography
-              fontWeight={500}
               variant='subtitle2'
               sx={{
                 position: "relative",
                 "&::before": {
+                  fontWeight: 700,
                   position: "absolute",
                   bottom: "calc(100% - 0.1em)",
                   left: 0,
-                  content: "'topic'",
+                  content: "'목표'",
                   textTransform: "uppercase",
                   color: (theme) => theme.palette.text.disabled,
                   fontSize: (theme) => theme.typography.pxToRem(12),
                 },
               }}>
-              주제: {minutes.topic}
+              {minutes.topic}
             </Typography>
             <Typography
               sx={{
                 position: "relative",
                 "&::before": {
+                  fontWeight: 700,
                   position: "absolute",
                   bottom: "calc(100% - 0.1em)",
                   left: 0,
-                  content: "'date'",
+                  content: "'날짜'",
                   textTransform: "uppercase",
                   color: (theme) => theme.palette.text.disabled,
                   fontSize: (theme) => theme.typography.pxToRem(12),
@@ -183,10 +184,11 @@ function MeetingMinutesViewer() {
               sx={{
                 position: "relative",
                 "&::before": {
+                  fontWeight: 700,
                   position: "absolute",
                   bottom: "calc(100% - 0.1em)",
                   left: 0,
-                  content: "'participants'",
+                  content: "'참여 인원'",
                   textTransform: "uppercase",
                   color: (theme) => theme.palette.text.disabled,
                   fontSize: (theme) => theme.typography.pxToRem(12),

@@ -75,13 +75,13 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
   }
 
   return (
-    <Stack ref={focusRef} flex={1} gap={1}>
+    <Stack ref={focusRef} flex={1} gap={2}>
       {formik.values.contents.map(({ item }, index) => (
         <Stack key={index} direction='row' alignItems={"center"} gap={1}>
           <TextField
             placeholder='회의록을 작성하세요!'
             fullWidth
-            label='item'
+            label='항목'
             rows={10}
             value={item}
             onKeyDown={(e) => handleKeyEvent(e, index)}

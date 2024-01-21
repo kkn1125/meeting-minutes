@@ -74,7 +74,7 @@ function TagField({ name, formik }: TagFieldProps) {
           // onChange={(e) => }
           onInput={handleKeyDownDesktop}
           onKeyDown={handleKeyDownRemove}
-          placeholder='참여자 이름'
+          placeholder='이름'
           size='small'
           margin='normal'
           onBlur={formik.handleBlur}

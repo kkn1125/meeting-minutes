@@ -239,7 +239,7 @@ function MeetingMinutes() {
               ref={categoryRef}
               {...params}
               name='category'
-              label='category'
+              label='분류'
               error={formik.touched.category && Boolean(formik.errors.category)}
               helperText={formik.touched.category && formik.errors.category}
               FormHelperTextProps={{
@@ -341,7 +341,7 @@ function MeetingMinutes() {
           <ContentListField name='contents' formik={formik} />
           <TextField
             placeholder='떠오르는 아이디어를 작성하세요!'
-            label='note'
+            label='메모'
             name='note'
             multiline
             rows={10}
