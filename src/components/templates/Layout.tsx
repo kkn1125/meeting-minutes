@@ -51,7 +51,7 @@ function Layout() {
   const [breadcrumbs, setBreadcrumbs] = useState<Crumb[]>([]);
 
   useEffect(() => {
-    console.log("start drop event");
+    // console.log("start drop event");
     window.addEventListener("dragover", (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -67,12 +67,13 @@ function Layout() {
       e.stopPropagation();
       const dropFile = e.dataTransfer.files[0];
       if (dropFile && dropFile.type.match(/json/)) {
-        console.log("drop", e.dataTransfer.files);
+        // console.log("drop", e.dataTransfer.files);
         docuManager.import("json", dropFile, () => {
-          console.log("success");
+          // console.log("success");
           dataDispatch({
             type: DATA_ACTION.LOAD,
           });
+          alert('등록이 완료되었습니다.')
         });
       } else {
         alert("지원되지 않는 파일 타입입니다.");

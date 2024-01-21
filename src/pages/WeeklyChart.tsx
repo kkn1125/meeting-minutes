@@ -3,7 +3,7 @@
 
 import { Button, Chip, Stack, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { Chart } from "react-chartjs-2";
+import { Bar, Chart } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -12,6 +12,7 @@ import {
   BarElement,
   CategoryScale,
   LinearScale,
+  BarController,
 } from "chart.js";
 import { format } from "../util/features";
 import { DocumentationManager } from "../model/documentation.manager";
@@ -19,6 +20,7 @@ import Minutes from "../model/minutes";
 
 ChartJS.register(
   ArcElement,
+  BarController,
   BarElement,
   Tooltip,
   Legend,
