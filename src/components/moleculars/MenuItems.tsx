@@ -5,7 +5,13 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import MenuIcon from "@mui/icons-material/Menu";
 import SaveIcon from "@mui/icons-material/Save";
-import { IconButton, ListItemIcon, MenuList, Typography } from "@mui/material";
+import {
+  Avatar,
+  IconButton,
+  ListItemIcon,
+  MenuList,
+  Typography,
+} from "@mui/material";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import Grow from "@mui/material/Grow";
 import MenuItem from "@mui/material/MenuItem";
@@ -22,7 +28,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { DocumentationManager } from "../../model/documentation.manager";
 import { DATA_ACTION, DataDispatchContext } from "../../context/DataProvider";
-import { BASE } from "../../util/global";
+import { BASE, MODE } from "../../util/global";
+import InsertLinkIcon from "@mui/icons-material/InsertLink";
 
 function MenuItems() {
   const dataDispatch = useContext(DataDispatchContext);
@@ -30,6 +37,7 @@ function MenuItems() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLButtonElement>(null);
+  const [kscriptLoaded, setKscriptLoaded] = useState(false);
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -57,6 +65,20 @@ function MenuItems() {
 
   // return focus to the button when we transitioned from !open -> open
   const prevOpen = useRef(open);
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = `https://t1.kakaocdn.net/kakao_js_sdk/${"2.6.0"}/kakao.min.js`;
+    script.integrity =
+      "sha384-6MFdIr0zOira1CHQkedUqJVql0YtcZA1P0nbPrQYJXVJZUkTk/oX4U9GhUIs3/z8";
+    script.crossOrigin = "anonymous";
+
+    document.head.append(script);
+    script.onload = () => {
+      window.Kakao.init("9857f58d3f45187bec57ffded30e08f0");
+      setKscriptLoaded(true);
+    };
+  }, [window.Kakao]);
 
   useEffect(() => {
     if (prevOpen.current === true && open === false) {
@@ -87,6 +109,21 @@ function MenuItems() {
       }
     );
     input.remove();
+  }
+
+  function handleCopyJsonToLink() {
+    const jsonUrl = docuManager.jsonToUrl();
+    navigator.clipboard
+      .writeText(
+        MODE
+          ? `http://localhost:5000/download?json=${jsonUrl}`
+          : `https://kkn1125.github.io/meeting-minutes/download?json=${jsonUrl}`
+      )
+      .then(() => {
+        alert(
+          "다운로드 링크가 복사되었습니다. 해당 링크로 접속하시면 백업 데이터를 다운로드 할 수 있습니다."
+        );
+      });
   }
 
   return (
@@ -149,6 +186,7 @@ function MenuItems() {
                     onClick={(e) => {
                       handleClose(e);
                       docuManager.saveAll();
+                      alert("데이터가 저장되었습니다.");
                     }}>
                     <ListItemIcon>
                       <SaveIcon fontSize='small' />
@@ -179,6 +217,18 @@ function MenuItems() {
                     </ListItemIcon>
                     <Typography variant='body2' color='text.secondary'>
                       백업 데이터 내보내기
+                    </Typography>
+                  </MenuItem>
+                  <MenuItem
+                    onClick={(e) => {
+                      handleClose(e);
+                      handleCopyJsonToLink();
+                    }}>
+                    <ListItemIcon>
+                      <InsertLinkIcon />
+                    </ListItemIcon>
+                    <Typography variant='body2' color='text.secondary'>
+                      링크로 내보내기
                     </Typography>
                   </MenuItem>
                   <MenuItem

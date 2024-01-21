@@ -1,3 +1,4 @@
+import { format } from "../util/features";
 import Documentation from "./documentation";
 import Minutes from "./minutes";
 import { v4 } from "uuid";
@@ -11,6 +12,29 @@ export class DocumentationManager {
   findOne(id: string) {
     return this.documentation.findOne(id);
   }
+  findByTime(startTime: Date, endTime: Date) {
+    return this.documentation.findByTime(startTime, endTime);
+  }
+  findGroupByTime(startTime: Date, endTime: Date): Minutes[][] {
+    const year = startTime.getFullYear();
+    const month = startTime.getMonth();
+    const date = startTime.getDate();
+    // const baseTime = format(startTime, "YYYY-MM-dd");
+    const temp = {};
+    for (let i = date; i < date + 7; i++) {
+      const timeIndex = format(new Date(year, month, i), "YYYY-MM-dd");
+      temp[timeIndex] = [];
+    }
+    const timeList = this.findByTime(startTime, endTime);
+    return Object.values(
+      timeList.reduce((acc, cur) => {
+        const timeIndex = cur.createdAt.split("T")[0];
+        if (!acc[timeIndex]) acc[timeIndex] = [];
+        if (acc[timeIndex]) acc[timeIndex].push(cur);
+        return acc;
+      }, temp)
+    );
+  }
   add(minutes: Minutes) {
     this.documentation.add(minutes);
   }
@@ -22,6 +46,15 @@ export class DocumentationManager {
   }
   saveAll() {
     this.documentation.saveAll();
+  }
+  jsonToUrl() {
+    const jsonUrl = encodeURIComponent(JSON.stringify(this.findAll()));
+    // const blob = new Blob([JSON.stringify(this.findAll(), null, 2)]);
+    // const file = new File([blob], "backup.json", {
+    //   type: "application/json",
+    // });
+    // const url = URL.createObjectURL(file);
+    return jsonUrl;
   }
   import(type: string, file: File, cb: () => void) {
     switch (type) {
@@ -49,12 +82,12 @@ export class DocumentationManager {
   download(type: string, data: Minutes[]) {
     const filename = v4() + "." + type;
     const url = URL.createObjectURL(
-      new File([new Blob([JSON.stringify(data, null, 2)])], "test.json", {
+      new File([new Blob([JSON.stringify(data, null, 2)])], "backup.json", {
         type: "application/json",
       })
     );
     const a = document.createElement("a");
-    a.download = filename;
+    a.download = "backup-" + filename;
     a.href = url;
     a.click();
     a.remove();

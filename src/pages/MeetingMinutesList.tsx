@@ -16,7 +16,7 @@ import { BASE } from "../util/global";
 function MeetingMinutesList() {
   const docuManager = new DocumentationManager();
   const data = useContext(DataContext);
-  const dataDispatch = useContext(DataDispatchContext);
+  // const dataDispatch = useContext(DataDispatchContext);
   const navigate = useNavigate();
   const [minutesList, setMinutesList] = useState<Minutes[]>(null);
 
@@ -30,11 +30,24 @@ function MeetingMinutesList() {
 
   if (minutesList === null) {
     return (
-      <List component={Stack} gap={1}>
-        <Skeleton width='100%' height='3em' />
-        <Skeleton width='100%' height='3em' />
-        <Skeleton width='100%' height='3em' />
-        <Skeleton width='100%' height='3em' />
+      <List
+        component={Stack}
+        gap={1}
+        sx={{
+          m: 5,
+        }}>
+        <Stack direction='row' alignItems='center' gap={2}>
+          <InsertDriveFileOutlinedIcon color='info' />
+          <Skeleton width='100%' sx={{ fontSize: "2em" }} />
+        </Stack>
+        <Stack direction='row' alignItems='center' gap={2}>
+          <InsertDriveFileOutlinedIcon color='info' />
+          <Skeleton width='100%' sx={{ fontSize: "2em" }} />
+        </Stack>
+        <Stack direction='row' alignItems='center' gap={2}>
+          <InsertDriveFileOutlinedIcon color='info' />
+          <Skeleton width='100%' sx={{ fontSize: "2em" }} />
+        </Stack>
       </List>
     );
   }

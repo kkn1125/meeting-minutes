@@ -6,6 +6,8 @@ import MeetingMinutes from "./pages/MeetingMinutes.tsx";
 import MeetingMinutesList from "./pages/MeetingMinutesList.tsx";
 import MeetingMinutesViewer from "./pages/MeetingMinutesViewer.tsx";
 import { BASE } from "./util/global.ts";
+import WeeklyChart from "./pages/WeeklyChart.tsx";
+import Download from "./pages/Download.tsx";
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
             <Route path='view' element={<MeetingMinutesViewer />} />
             <Route path='update' element={<MeetingMinutes />} />
           </Route>
+          <Route path='chart' element={<WeeklyChart />} />
+          <Route path='download' element={<Download />} />
         </Route>
       </Routes>
     </Box>

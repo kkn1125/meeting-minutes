@@ -1,6 +1,7 @@
 import { TransferWithinAStation } from "@mui/icons-material";
 import Minutes from "./minutes";
 import { Dispatch, SetStateAction } from "react";
+import { format } from "../util/features";
 
 export type Category = {
   caption: string;
@@ -98,6 +99,14 @@ export default class Documentation {
 
   findOne(id: string) {
     return this.temp.find((tmp) => tmp.id === id);
+  }
+
+  findByTime(startTime: Date, endTime: Date) {
+    const sTime = format(startTime, "YYYY-MM-ddTHH:mm:ss.SSS");
+    const eTime = format(endTime, "YYYY-MM-ddTHH:mm:ss.SSS");
+    return this.temp.filter(
+      (minutes) => sTime <= minutes.createdAt && minutes.createdAt <= eTime
+    );
   }
 
   save(key: string, value: Minutes[] | Category[]) {

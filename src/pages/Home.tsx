@@ -39,6 +39,13 @@ function Home() {
           color='success'>
           Archive
         </Button>
+        <Button
+          component={Link}
+          to={BASE + "chart?view=weekly"}
+          variant='contained'
+          color='success'>
+          Weekly Chart
+        </Button>
       </Stack>
     </Stack>
   );

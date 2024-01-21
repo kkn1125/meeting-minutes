@@ -1,5 +1,6 @@
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import {
+  Avatar,
   Box,
   Breadcrumbs,
   Paper,
@@ -8,12 +9,20 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 import DarkModeButton from "../atoms/DarkModeButton";
 import MenuItems from "../moleculars/MenuItems";
 import Footer from "../organisms/Footer";
 import { BASE } from "../../util/global";
+import { DocumentationManager } from "../../model/documentation.manager";
+import { DATA_ACTION, DataDispatchContext } from "../../context/DataProvider";
+
+declare global {
+  interface Window {
+    Kakao: any;
+  }
+}
 
 type Crumb = {
   name: string;
@@ -26,9 +35,13 @@ const crumbTo = {
   add: "WRITE",
   update: "UPDATE",
   view: "VIEW",
+  chart: "CHART",
 };
 
 function Layout() {
+  const docuManager = new DocumentationManager();
+  const dataDispatch = useContext(DataDispatchContext);
+
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
   const locate = useLocation();
@@ -36,6 +49,37 @@ function Layout() {
     new URLSearchParams(locate.search).entries()
   );
   const [breadcrumbs, setBreadcrumbs] = useState<Crumb[]>([]);
+
+  useEffect(() => {
+    console.log("start drop event");
+    window.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      document.body.classList.add("dragover");
+    });
+    document.addEventListener("mouseleave", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      document.body.classList.remove("dragover");
+    });
+    window.addEventListener("drop", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const dropFile = e.dataTransfer.files[0];
+      if (dropFile && dropFile.type.match(/json/)) {
+        console.log("drop", e.dataTransfer.files);
+        docuManager.import("json", dropFile, () => {
+          console.log("success");
+          dataDispatch({
+            type: DATA_ACTION.LOAD,
+          });
+        });
+      } else {
+        alert("지원되지 않는 파일 타입입니다.");
+      }
+      document.body.classList.remove("dragover");
+    });
+  }, []);
 
   useEffect(() => {
     const path = locate.pathname.slice(BASE.length);
@@ -54,6 +98,11 @@ function Layout() {
       crumblist.at(-1).to = crumblist.at(-1).to + "?id=" + params.id;
       crumblist.at(-1).name = crumblist.at(-1).name + " : " + params.id;
     }
+    if (params.view) {
+      crumblist.at(-1).to = crumblist.at(-1).to + "?view=" + params.view;
+      crumblist.at(-1).name =
+        crumblist.at(-1).name + " : " + params.view.toUpperCase();
+    }
     setBreadcrumbs(() => crumblist);
   }, [locate.pathname]);
 
@@ -70,23 +119,36 @@ function Layout() {
           direction='row'
           justifyContent={"space-between"}
           alignItems={"center"}>
-          <Breadcrumbs
-            separator={<NavigateNextIcon fontSize='small' />}
-            aria-label='breadcrumb'>
-            {breadcrumbs.map(({ name, to }, index) => (
-              <Typography
-                component={Link}
-                key={index}
-                to={to}
-                fontSize={(theme) => theme.typography.pxToRem(isMdUp ? 16 : 10)}
-                color={(theme) => theme.palette.text.primary}
+          <Stack direction='row' alignItems={"center"} gap={2}>
+            <Link to={BASE}>
+              <Avatar
+                src={`${BASE}favicon/favicon-32x32.png`}
                 sx={{
-                  textDecoration: "none",
-                }}>
-                {name}
-              </Typography>
-            ))}
-          </Breadcrumbs>
+                  width: 32,
+                  height: 32,
+                }}
+              />
+            </Link>
+            <Breadcrumbs
+              separator={<NavigateNextIcon fontSize='small' />}
+              aria-label='breadcrumb'>
+              {breadcrumbs.map(({ name, to }, index) => (
+                <Typography
+                  component={Link}
+                  key={index}
+                  to={to}
+                  fontSize={(theme) =>
+                    theme.typography.pxToRem(isMdUp ? 16 : 10)
+                  }
+                  color={(theme) => theme.palette.text.primary}
+                  sx={{
+                    textDecoration: "none",
+                  }}>
+                  {name}
+                </Typography>
+              ))}
+            </Breadcrumbs>
+          </Stack>
           <Stack direction='row' alignItems='center' gap={2}>
             <DarkModeButton />
             <MenuItems />
