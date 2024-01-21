@@ -47,34 +47,47 @@ function WeeklyChart() {
   useEffect(() => {
     const [start, end] = calulateWeek();
     const docuList = docuManager.findGroupByTime(start, end);
+    const categories = getCategories(docuManager.findAll());
+    const categoryGroup = categories.map((category) => {
+      return [category, filterCategory(docuList, category)];
+    });
+    const removeEmpty = categoryGroup.filter(
+      ([category, group]: [string, Minutes[][]]) =>
+        group.filter((c) => {
+          return c.length > 0;
+        }).length > 0
+    );
+    const subData = removeEmpty.map(
+      ([category, group]: [string, Minutes[][]]) => ({
+        label: "Category: " + category,
+        data: group.map((_) => _.length),
+        borderWidth: 1,
+        backgroundColor: `#${randomColor().join("")}`,
+      })
+    );
+    setSubDatas(subData);
     setDocumentations(docuList);
-
-    // const result: Minutes[][] = docuList.map((_) =>
-    //   Object.values(
-    //     _.reduce((acc, cur) => {
-    //       if (!acc[cur.category]) {
-    //         acc[cur.category] = [];
-    //       }
-    //       acc[cur.category].push(cur);
-    //       return acc;
-    //     }, {})
-    //   )
-    // );
-
-    // const dataSet = result.map((_) =>
-    //   _.length > 0
-    //     ? {
-    //         label: "Category: " + _[0]?.[0]?.category,
-    //         data: _,
-    //         borderWidth: 1,
-    //         backgroundColor: "grey",
-    //       }
-    //     : {}
-    // );
-
-    // console.log(dataSet);
-    // setSubDatas(dataSet);
   }, [today]);
+
+  function randomColor() {
+    const r = randomHex();
+    const g = randomHex();
+    const b = randomHex();
+    return [r.toString(16), g.toString(16), b.toString(16)];
+  }
+
+  function randomHex() {
+    return Math.floor(Math.random() * 255) + 1;
+  }
+
+  function getCategories(docus: Minutes[]) {
+    const categories = docus.map((docu) => docu.category);
+    return [...new Set(categories)];
+  }
+
+  function filterCategory(docuList: Minutes[][], category: string) {
+    return docuList.map((docu) => docu.filter((d) => d.category === category));
+  }
 
   function currentWeek() {
     setToday(new Date(_year, _month, _date));
@@ -88,7 +101,7 @@ function WeeklyChart() {
     const day = today.getDay();
 
     const aver = date + startWeekIndex;
-    const week = Math.floor(aver / 7);
+    // const week = Math.floor(aver / 7);
 
     const dateList = [];
     for (let i = date - day; i < date - day + 7; i++) {

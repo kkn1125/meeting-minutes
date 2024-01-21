@@ -1,5 +1,6 @@
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import {
+  Chip,
   List,
   ListItemButton,
   Skeleton,
@@ -12,6 +13,7 @@ import { DataContext } from "../context/DataProvider";
 import { DocumentationManager } from "../model/documentation.manager";
 import Minutes from "../model/minutes";
 import { BASE } from "../util/global";
+import { format } from "../util/features";
 
 function MeetingMinutesList() {
   const docuManager = new DocumentationManager();
@@ -62,7 +64,7 @@ function MeetingMinutesList() {
       {minutesList.length === 0 && (
         <Typography>등록된 회의록이 없습니다.</Typography>
       )}
-      {minutesList.map(({ id, title }) => (
+      {minutesList.map(({ id, title, category, createdAt }) => (
         <ListItemButton
           key={id}
           component={Stack}
@@ -71,6 +73,12 @@ function MeetingMinutesList() {
           onClick={() => handleViewer(id)}>
           <InsertDriveFileOutlinedIcon color='info' />
           <Typography>{title}</Typography>
+          <Chip label={category} size='small' />
+          <Typography
+            variant='body2'
+            color={(theme) => theme.palette.text.disabled}>
+            {format(createdAt, "YYYY-MM-dd HH:mm:ss")}
+          </Typography>
         </ListItemButton>
       ))}
     </List>
