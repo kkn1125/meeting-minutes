@@ -1,7 +1,15 @@
 // TODO: 주단위 차트 렌더링
 // TODO: 카카오톡 저장하기 기능 추가
 
-import { Button, Chip, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import {
   ArcElement,
   BarController,
@@ -12,7 +20,7 @@ import {
   LinearScale,
   Tooltip,
 } from "chart.js";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Chart } from "react-chartjs-2";
 import { DocumentationManager } from "../model/documentation.manager";
 import Minutes from "../model/minutes";
@@ -38,11 +46,18 @@ beforeMonthTime.setMonth(beforeMonthTime.getMonth() - 1);
 nextMonthTime.setMonth(nextMonthTime.getMonth() + 1);
 
 function WeeklyChart() {
+  const theme = useTheme();
+  const chartRef = useRef<ChartJS>(null);
   const docuManager = new DocumentationManager();
   const [today, setToday] = useState(new Date(_year, _month, _date));
   const [weekDateList, setWeekDateList] = useState([]);
   const [documentations, setDocumentations] = useState<Minutes[][]>([]);
   const [subDatas, setSubDatas] = useState([]);
+  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
+
+  useEffect(() => {
+    handleResizeChart();
+  }, [isMdUp]);
 
   useEffect(() => {
     const [start, end] = calulateWeek();
@@ -68,6 +83,16 @@ function WeeklyChart() {
     setSubDatas(subData);
     setDocumentations(docuList);
   }, [today]);
+
+  function handleResizeChart() {
+    const chart = chartRef.current;
+    if (chart) {
+      setTimeout(() => {
+        chart.resize();
+        chart.draw();
+      }, 50);
+    }
+  }
 
   function randomColor() {
     const r = randomHex();
@@ -155,28 +180,32 @@ function WeeklyChart() {
           Next Week
         </Button>
       </Stack>
-      <Chart
-        type={"bar"}
-        data={{
-          labels: weekDateList.map(dayForWeek),
-          datasets: [
-            {
-              label: "Amount",
-              data: documentations.map((_) => _.length),
-              borderWidth: 1,
-              backgroundColor: "beige",
+      <Stack flex={1}>
+        <Chart
+          ref={chartRef}
+          type={"bar"}
+          data={{
+            labels: weekDateList.map(dayForWeek),
+            datasets: [
+              {
+                label: "Amount",
+                data: documentations.map((_) => _.length),
+                borderWidth: 1,
+                backgroundColor: "beige",
+              },
+              ...subDatas,
+            ],
+          }}
+          options={{
+            aspectRatio: isMdUp ? 2 : 0.85,
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
             },
-            ...subDatas,
-          ],
-        }}
-        options={{
-          scales: {
-            y: {
-              beginAtZero: true,
-            },
-          },
-        }}
-      />
+          }}
+        />
+      </Stack>
     </Stack>
   );
 }

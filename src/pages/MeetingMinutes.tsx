@@ -98,7 +98,7 @@ function MeetingMinutes() {
         navigate(`${BASE}meeting-minutes/view?id=${params.id}`);
       } else {
         docuManager.add(minutes);
-        navigate(BASE);
+        navigate(`${BASE}meeting-minutes`);
       }
     },
   });
@@ -108,10 +108,11 @@ function MeetingMinutes() {
   }, [formik.values.category]);
 
   const defaultCategory = useMemo(() => {
-    return (
+    const defaultValue =
       formik.values.category ??
-      docuManager.documentation.categories?.[0]?.inputValue
-    );
+      docuManager.documentation.categories?.[0]?.inputValue;
+    formik.setFieldValue("category", defaultValue);
+    return defaultValue;
   }, [formik.values.category]);
 
   useEffect(() => {

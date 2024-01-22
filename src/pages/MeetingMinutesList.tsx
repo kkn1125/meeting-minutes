@@ -1,33 +1,52 @@
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import {
+  Box,
   Chip,
   List,
   ListItemButton,
+  Pagination,
   Skeleton,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { DataContext } from "../context/DataProvider";
 import { DocumentationManager } from "../model/documentation.manager";
 import Minutes from "../model/minutes";
-import { BASE } from "../util/global";
 import { format } from "../util/features";
+import { BASE } from "../util/global";
 
+const LIMIT = 5;
 function MeetingMinutesList() {
   const docuManager = new DocumentationManager();
   const data = useContext(DataContext);
-  // const dataDispatch = useContext(DataDispatchContext);
   const navigate = useNavigate();
   const [minutesList, setMinutesList] = useState<Minutes[]>(null);
+  const locate = useLocation();
+  const params = Object.fromEntries(
+    new URLSearchParams(locate.search).entries()
+  );
 
   useEffect(() => {
-    setMinutesList(() => docuManager.findAll());
+    const docuList = docuManager.findAll();
+    setMinutesList(() =>
+      docuList.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    );
   }, [data.data, data.version]);
+
+  const minutesMemoList = useMemo(() => {
+    const page = Number(params.page ?? 1);
+    return (minutesList || []).slice((page - 1) * LIMIT, page * LIMIT);
+  }, [minutesList, params.page]);
 
   function handleViewer(id: string) {
     navigate(`${BASE}meeting-minutes/view?id=${id}`);
+  }
+
+  function handleNavigatePage(e: ChangeEvent<unknown>, value: number) {
+    navigate(`?page=${value}`);
   }
 
   if (minutesList === null) {
@@ -55,33 +74,67 @@ function MeetingMinutesList() {
   }
 
   return (
-    <List
-      component={Stack}
-      gap={1}
-      sx={{
-        m: 5,
-      }}>
-      {minutesList.length === 0 && (
-        <Typography>등록된 회의록이 없습니다.</Typography>
-      )}
-      {minutesList.map(({ id, title, category, createdAt }) => (
-        <ListItemButton
-          key={id}
-          component={Stack}
-          direction='row'
-          gap={1}
-          onClick={() => handleViewer(id)}>
-          <InsertDriveFileOutlinedIcon color='info' />
-          <Typography>{title}</Typography>
-          <Chip label={category} size='small' />
-          <Typography
-            variant='body2'
-            color={(theme) => theme.palette.text.disabled}>
-            {format(createdAt, "YYYY-MM-dd HH:mm:ss")}
-          </Typography>
-        </ListItemButton>
-      ))}
-    </List>
+    <Stack>
+      <List
+        component={Stack}
+        gap={1}
+        sx={{
+          m: 5,
+          minHeight: 280,
+        }}>
+        {minutesList.length === 0 && (
+          <Typography>등록된 회의록이 없습니다.</Typography>
+        )}
+        {minutesMemoList.map(({ id, title, category, createdAt }) => (
+          <ListItemButton
+            key={id}
+            component={Stack}
+            direction='row'
+            alignItems='flex-start'
+            gap={1}
+            onClick={() => handleViewer(id)}>
+            <InsertDriveFileOutlinedIcon color='info' />
+            <Stack
+              direction={{
+                xs: "column",
+                md: "row",
+              }}
+              gap={1}
+              justifyContent={"space-between"}
+              flex={1}>
+              <Stack
+                direction={{
+                  xs: "column",
+                  md: "row",
+                }}
+                gap={1}>
+                <Tooltip title='분류'>
+                  <Box>
+                    <Chip label={category} size='small' />
+                  </Box>
+                </Tooltip>
+                <Typography>{title}</Typography>
+              </Stack>
+              <Typography
+                variant='body2'
+                color={(theme) => theme.palette.text.disabled}>
+                {format(createdAt, "YYYY-MM-dd HH:mm:ss")}
+              </Typography>
+            </Stack>
+          </ListItemButton>
+        ))}
+      </List>
+      <Stack direction='row' justifyContent={"center"} sx={{ mt: 1, mb: 3 }}>
+        <Pagination
+          defaultPage={1}
+          count={Math.ceil(minutesList.length / LIMIT)}
+          shape='rounded'
+          showFirstButton
+          showLastButton
+          onChange={handleNavigatePage}
+        />
+      </Stack>
+    </Stack>
   );
 }
 
