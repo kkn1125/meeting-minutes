@@ -162,14 +162,44 @@ function MeetingMinutesViewer() {
               }}>
               {format(minutes.minutesDate, "YYYY. MM. dd HH:mm:ss")}
             </Typography>
-          </Stack>
+            {/* participants */}
+            <Stack direction='row' justifyContent={"space-between"} gap={3}>
+              <Stack
+                direction='row'
+                gap={2}
+                flex={1}
+                sx={{
+                  position: "relative",
+                  "&::before": {
+                    fontWeight: 700,
+                    position: "absolute",
+                    bottom: "calc(100% - 0.1em)",
+                    left: 0,
+                    content: "'참여 인원'",
+                    textTransform: "uppercase",
+                    color: (theme) => theme.palette.text.disabled,
+                    fontSize: (theme) => theme.typography.pxToRem(12),
+                  },
+                }}>
+                {minutes.participants.map((participant, index) => (
+                  <Chip
+                    key={participant.name + index}
+                    label={participant.name}
+                  />
+                ))}
+                <Typography
+                  variant='caption'
+                  sx={{
+                    my: "auto",
+                    color: (theme) => theme.palette.text.disabled,
+                  }}>
+                  {minutes.participants.length}명
+                </Typography>
+              </Stack>
+            </Stack>
 
-          {/* participants */}
-          <Stack direction='row' justifyContent={"space-between"} gap={3}>
-            <Stack
-              direction='row'
-              gap={2}
-              flex={1}
+            {/* create & update time */}
+            <Typography
               sx={{
                 position: "relative",
                 "&::before": {
@@ -177,24 +207,30 @@ function MeetingMinutesViewer() {
                   position: "absolute",
                   bottom: "calc(100% - 0.1em)",
                   left: 0,
-                  content: "'참여 인원'",
+                  content: "'생성일자'",
                   textTransform: "uppercase",
                   color: (theme) => theme.palette.text.disabled,
                   fontSize: (theme) => theme.typography.pxToRem(12),
                 },
               }}>
-              {minutes.participants.map((participant, index) => (
-                <Chip key={participant.name + index} label={participant.name} />
-              ))}
-              <Typography
-                variant='caption'
-                sx={{
-                  my: "auto",
+              {format(minutes.createdAt, "YYYY. MM. dd HH:mm:ss")}
+            </Typography>
+            <Typography
+              sx={{
+                position: "relative",
+                "&::before": {
+                  fontWeight: 700,
+                  position: "absolute",
+                  bottom: "calc(100% - 0.1em)",
+                  left: 0,
+                  content: "'수정일자'",
+                  textTransform: "uppercase",
                   color: (theme) => theme.palette.text.disabled,
-                }}>
-                {minutes.participants.length}명
-              </Typography>
-            </Stack>
+                  fontSize: (theme) => theme.typography.pxToRem(12),
+                },
+              }}>
+              {format(minutes.updatedAt, "YYYY. MM. dd HH:mm:ss")}
+            </Typography>
           </Stack>
         </Stack>
 
