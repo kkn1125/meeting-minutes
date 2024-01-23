@@ -105,7 +105,7 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
       if (text.match(/[\n\r]/gm)) {
         formik.values.contents.splice(index, 1);
         const data = [];
-        for (const t of text.split(/[\n\r]+/gm)) {
+        for (const t of text.split(/[\n\r]+/gm).filter((_) => _.trim())) {
           const trimText = t.trim();
           if (trimText.startsWith("-")) {
             const word = trimText.slice(trimText.indexOf("-") + 1);
