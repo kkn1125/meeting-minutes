@@ -1,19 +1,29 @@
 import AddIcon from "@mui/icons-material/Add";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { Box, IconButton, Stack, TextField, Tooltip } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  Stack,
+  TextField,
+  Tooltip,
+} from "@mui/material";
 import { FormikProps } from "formik";
 import {
   ChangeEvent,
   ClipboardEvent,
   Fragment,
   useEffect,
+  MouseEvent as ReactMouseEvent,
   KeyboardEvent as ReactKeyboardEvent,
   useMemo,
   useRef,
   useState,
 } from "react";
 import { InitialValues } from "../../model/minutes";
+import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 type ContentListFieldProps = {
   name: string;
@@ -21,9 +31,34 @@ type ContentListFieldProps = {
 };
 
 function ContentListField({ name, formik }: ContentListFieldProps) {
+  const originRef = useRef(-1);
   const dragIndex = useRef(-1);
   const [dragNum, setDragNum] = useState(-1);
   const focusRef = useRef<HTMLInputElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [formik.values.contents]);
+
+  useEffect(() => {
+    // console.log(isMobile ? "mobile" : "desktop");
+    if (isMobile) {
+      //
+    }
+  }, [isMobile]);
+
+  function handleResize() {
+    const mobile = window.matchMedia(
+      "(hover: none) and (pointer: coarse)"
+    ).matches;
+    // console.log(mobile);
+    setIsMobile(() => mobile);
+  }
 
   useEffect(() => {
     window.addEventListener("dragstart", handleDragStart);
@@ -50,13 +85,15 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
     const target = e.target as HTMLDivElement;
     const draggableEl = target.closest("[draggable]") as HTMLDivElement;
     const index = draggableEl.dataset.index;
+    originRef.current = Number(index);
     e.dataTransfer.clearData();
     e.dataTransfer.setData("origin", index);
   }
 
   function handleDragEnd(e: DragEvent) {
     const indexString = e.dataTransfer.getData("origin");
-    const origin = Number(indexString);
+    const origin =
+      originRef.current > -1 ? originRef.current : Number(indexString);
     const dragIndexNum = dragIndex.current;
 
     if (dragIndexNum !== -1) {
@@ -232,6 +269,23 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
     }
   }
 
+  function handlePrevOrder(e: ReactMouseEvent, index: number) {
+    const [item] = formik.values.contents.splice(index, 1);
+    formik.values.contents.splice(index - 1 > 0 ? index - 1 : 0, 0, item);
+    formik.setFieldValue("contents", formik.values.contents);
+  }
+  function handleNextOrder(e: ReactMouseEvent, index: number) {
+    const [item] = formik.values.contents.splice(index, 1);
+    formik.values.contents.splice(
+      index + 1 < formik.values.contents.length
+        ? index + 1
+        : formik.values.contents.length,
+      0,
+      item
+    );
+    formik.setFieldValue("contents", formik.values.contents);
+  }
+
   return (
     <Stack ref={focusRef} flex={1} gap={2} id='content-panel'>
       {formik.values.contents.map(({ item }, index, o) => (
@@ -242,47 +296,67 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
             alignItems={"center"}
             gap={1}
             data-index={index}
-            sx={{
-              ...(dragNum === index && {
-                position: "relative",
-                "&::before": {
-                  content: '""',
-                  display: "block",
-                  position: "absolute",
-                  left: 80,
-                  right: 150,
-                  top: -8,
-                  p: 0.3,
-                  borderTop: (theme) =>
-                    `1px dashed ${theme.palette.text.primary}`,
-                },
-              }),
-              ...(dragNum === index + 1 && {
-                position: "relative",
-                "&::after": {
-                  content: '""',
-                  display: "block",
-                  position: "absolute",
-                  left: 80,
-                  right: 150,
-                  bottom: -8,
-                  p: 0.3,
-                  borderBottom: (theme) =>
-                    `1px dashed ${theme.palette.text.primary}`,
-                },
-              }),
-            }}>
+            sx={
+              !isMobile
+                ? {
+                    ...(dragNum === index && {
+                      position: "relative",
+                      "&::before": {
+                        content: '""',
+                        display: "block",
+                        position: "absolute",
+                        left: 80,
+                        right: 150,
+                        top: -8,
+                        p: 0.3,
+                        borderTop: (theme) =>
+                          `1px dashed ${theme.palette.text.primary}`,
+                      },
+                    }),
+                    ...(dragNum === index + 1 && {
+                      position: "relative",
+                      "&::after": {
+                        content: '""',
+                        display: "block",
+                        position: "absolute",
+                        left: 80,
+                        right: 150,
+                        bottom: -8,
+                        p: 0.3,
+                        borderBottom: (theme) =>
+                          `1px dashed ${theme.palette.text.primary}`,
+                      },
+                    }),
+                  }
+                : {}
+            }>
             <Stack direction='row' alignItems='center' gap={1} flex={1}>
-              <Tooltip title='move' placement='left'>
-                <Stack
-                  sx={{
-                    "&:hover": {
-                      cursor: "move",
-                    },
-                  }}>
-                  <DragIndicatorIcon />
+              {!isMobile ? (
+                <Tooltip title='move' placement='left'>
+                  <Stack
+                    sx={{
+                      "&:hover": {
+                        cursor: "move",
+                      },
+                    }}>
+                    <DragIndicatorIcon />
+                  </Stack>
+                </Tooltip>
+              ) : (
+                <Stack>
+                  <Button
+                    sx={{ height: 10, minWidth: 0, p: 1, m: 0 }}
+                    onClick={(e) => handlePrevOrder(e, index)}>
+                    <ArrowDropUpIcon fontSize='small' />
+                  </Button>
+                  <Button
+                    sx={{ height: 10, minWidth: 0, p: 1, m: 0 }}
+                    onClick={(e) => handleNextOrder(e, index)}>
+                    <ArrowDropDownIcon fontSize='small' />
+                  </Button>
                 </Stack>
-              </Tooltip>
+              )}
+
               {item.startsWith("data:image/") ? (
                 <Stack flex={1} gap={1}>
                   <TextField

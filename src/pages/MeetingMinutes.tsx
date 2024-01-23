@@ -120,8 +120,10 @@ function MeetingMinutes() {
     if (params.id) {
       const minutes = docuManager.findOne(params.id);
       formik.setValues(minutes);
+    } else {
+      formik.setValues(initialValues);
     }
-  }, []);
+  }, [params.id]);
 
   useEffect(() => {
     const focusEl = inputRef.current;
@@ -372,6 +374,7 @@ function MeetingMinutes() {
                 xs: 1,
                 md: 0,
               },
+              px: 5,
               color: "white",
               borderRadius: "100px",
             }}>
