@@ -118,12 +118,12 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
   }
 
   function handleAddItem(index: number) {
-    setTimeout(() => {
-      const inputs = [...focusRef.current.querySelectorAll("input")];
-      inputs[inputs.length - 1].focus();
-    }, 50);
     formik.values.contents.splice(index + 1, 0, { item: "" });
     formik.setFieldValue("contents", formik.values.contents);
+    setTimeout(() => {
+      const inputs = [...focusRef.current.querySelectorAll("input")];
+      inputs?.[index - 1]?.focus();
+    }, 50);
   }
 
   function handleRemoveItem(index: number) {
