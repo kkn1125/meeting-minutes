@@ -8,6 +8,7 @@ import {
   ClipboardEvent,
   Fragment,
   useEffect,
+  KeyboardEvent as ReactKeyboardEvent,
   useMemo,
   useRef,
   useState,
@@ -137,7 +138,7 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
     }
   }
 
-  function handleKeyEvent(e: KeyboardEvent) {
+  function handleKeyEvent(e: ReactKeyboardEvent) {
     const inputs = [
       ...focusRef.current.querySelectorAll("input:not([disabled])"),
     ] as HTMLInputElement[];
