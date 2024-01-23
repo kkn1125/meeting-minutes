@@ -53,10 +53,11 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
   }, [isMobile]);
 
   function handleResize() {
-    const mobile = window.matchMedia(
-      "(hover: none) and (pointer: coarse)"
-    ).matches;
-    // console.log(mobile);
+    const matches = /android|mobile|ios|iphone|ipad|macintosh/i;
+    const mobile =
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches ||
+      !!navigator.userAgent.match(matches);
+
     setIsMobile(() => mobile);
   }
 
