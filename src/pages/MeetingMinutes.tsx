@@ -335,7 +335,7 @@ function MeetingMinutes() {
         {/* content & note */}
         <Stack
           direction={{
-            md: "row",
+            lg: "row",
             xs: "column",
           }}
           gap={2}>
@@ -346,7 +346,7 @@ function MeetingMinutes() {
             name='note'
             multiline
             rows={10}
-            sx={{ flex: 0.3 }}
+            sx={{ flex: 0.35 }}
             value={formik.values.note}
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}

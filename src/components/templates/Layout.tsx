@@ -51,7 +51,6 @@ function Layout() {
   const [breadcrumbs, setBreadcrumbs] = useState<Crumb[]>([]);
 
   useEffect(() => {
-    // console.log("start drop event");
     window.addEventListener("dragover", (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -66,10 +65,9 @@ function Layout() {
       e.preventDefault();
       e.stopPropagation();
       const dropFile = e.dataTransfer.files[0];
+
       if (dropFile && dropFile.type.match(/json/)) {
-        // console.log("drop", e.dataTransfer.files);
         docuManager.import("json", dropFile, () => {
-          // console.log("success");
           dataDispatch({
             type: DATA_ACTION.LOAD,
           });
@@ -168,7 +166,8 @@ function Layout() {
             my: 5,
             mx: "auto",
             width: {
-              md: "60%",
+              lg: "60%",
+              md: "80%",
               xs: "90%",
             },
           }}>

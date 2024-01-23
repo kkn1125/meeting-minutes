@@ -6,6 +6,7 @@ import {
   Divider,
   Skeleton,
   Stack,
+  TextField,
   Typography,
   useMediaQuery,
   useTheme,
@@ -205,11 +206,34 @@ function MeetingMinutesViewer() {
           justifyContent={"space-between"}
           gap={3}>
           <Stack flex={1} gap={2}>
-            {minutes.contents.map((content, index) => (
-              <Typography key={content.item + index} variant='body1'>
-                {content.item}
-              </Typography>
-            ))}
+            {minutes.contents.map(({ item }, index) =>
+              item.startsWith("data:image/") ? (
+                <Stack key={item + index}>
+                  <Box
+                    component='img'
+                    src={item}
+                    sx={{
+                      width: "100%",
+                    }}
+                  />
+                  <Typography
+                    align='center'
+                    variant='body2'
+                    sx={{
+                      p: 1,
+                      backgroundColor: (theme) =>
+                        theme.palette.background.paper,
+                      color: (theme) => theme.palette.text.secondary,
+                    }}>
+                    image
+                  </Typography>
+                </Stack>
+              ) : (
+                <Typography key={item + index} variant='body1'>
+                  {item}
+                </Typography>
+              )
+            )}
           </Stack>
           <Typography variant='body2' sx={{ flex: 0.3 }}>
             {minutes.note || "No Memo"}

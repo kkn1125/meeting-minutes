@@ -79,15 +79,22 @@ export class DocumentationManager {
     };
     reader.readAsText(file);
   }
+  createBlob(data: Minutes[]) {
+    return new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json",
+    });
+  }
+  createFile(data: Minutes[], type = "json") {
+    const filename = "backup-" + v4() + "." + type;
+    return new File([this.createBlob(data)], filename, {
+      type: "application/json",
+    });
+  }
   download(type: string, data: Minutes[]) {
-    const filename = v4() + "." + type;
-    const url = URL.createObjectURL(
-      new File([new Blob([JSON.stringify(data, null, 2)])], "backup.json", {
-        type: "application/json",
-      })
-    );
+    const file = this.createFile(data, type);
+    const url = URL.createObjectURL(file);
     const a = document.createElement("a");
-    a.download = "backup-" + filename;
+    a.download = file.name;
     a.href = url;
     a.click();
     a.remove();
