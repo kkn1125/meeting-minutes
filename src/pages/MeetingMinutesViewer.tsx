@@ -4,6 +4,8 @@ import {
   Button,
   Chip,
   Divider,
+  List,
+  ListItemButton,
   Skeleton,
   Stack,
   TextField,
@@ -11,10 +13,10 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Fragment, useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { DocumentationManager } from "../model/documentation.manager";
-import Minutes from "../model/minutes";
+import Minutes, { CONTENT_TYPE } from "../model/minutes";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
 
@@ -77,11 +79,16 @@ function MeetingMinutesViewer() {
           md: "center",
         }}
         gap={1}>
-        <Stack direction='row' alignItems={"center"} gap={1}>
-          <ClassIcon color='error' fontSize='large' />
-          <Typography fontWeight={700} variant={isMdUp ? "h4" : "h5"}>
-            분류:
-          </Typography>
+        <Stack
+          direction={{ xs: "column", lg: "row" }}
+          alignItems={"center"}
+          gap={1}>
+          <Stack direction='row' gap={1} alignItems={"center"}>
+            <ClassIcon color='error' fontSize='large' />
+            <Typography fontWeight={700} variant={isMdUp ? "h4" : "h5"}>
+              분류:
+            </Typography>
+          </Stack>
           <Typography fontWeight={700} variant={isMdUp ? "h4" : "h5"}>
             {minutes.category}
           </Typography>
@@ -238,56 +245,82 @@ function MeetingMinutesViewer() {
 
         {/* content & note */}
         <Stack
+          component={List}
           direction={{ xs: "column", md: "row" }}
           justifyContent={"space-between"}
           gap={3}>
-          <Stack flex={1} gap={2}>
-            {minutes.contents.map(({ item }, index) =>
-              item.startsWith("data:image/") ? (
-                <Stack
-                  key={item + index}
-                  direction='row'
-                  gap={1}
-                  sx={{
-                    "&::before": {
-                      content: '"🖼️"',
-                    },
-                  }}>
-                  <Stack>
-                    <Box
-                      component='img'
-                      src={item}
+          <Stack flex={1} gap={1}>
+            {minutes.contents.map(({ item, type }, index, o) => (
+              <Fragment key={item + index}>
+                <ListItemButton>
+                  {type === CONTENT_TYPE.IMAGE ? (
+                    <Stack
+                      direction='row'
+                      gap={1}
                       sx={{
-                        width: "100%",
-                      }}
-                    />
-                    <Typography
-                      align='center'
-                      variant='body2'
-                      sx={{
-                        p: 1,
-                        backgroundColor: (theme) =>
-                          theme.palette.background.paper,
-                        color: (theme) => theme.palette.text.secondary,
+                        "&::before": {
+                          content: '"🖼️"',
+                        },
                       }}>
-                      image
+                      <Stack>
+                        <Box
+                          component='img'
+                          src={item}
+                          sx={{
+                            width: "100%",
+                          }}
+                        />
+                        <Typography
+                          align='center'
+                          variant='body2'
+                          sx={{
+                            p: 1,
+                            backgroundColor: (theme) =>
+                              theme.palette.background.paper,
+                            color: (theme) => theme.palette.text.secondary,
+                          }}>
+                          image
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  ) : type === CONTENT_TYPE.LINK ? (
+                    <Typography
+                      key={item + index}
+                      variant='body1'
+                      sx={{
+                        "&::before": {
+                          content: '"🔗"',
+                          mr: 1,
+                          textDecoration: "none",
+                        },
+                      }}>
+                      <Typography
+                        component={Link}
+                        to={item}
+                        target='_blank'
+                        sx={{
+                          color: (theme) => theme.palette.text.disabled,
+                        }}>
+                        {item}
+                      </Typography>
                     </Typography>
-                  </Stack>
-                </Stack>
-              ) : (
-                <Typography
-                  key={item + index}
-                  variant='body1'
-                  sx={{
-                    "&::before": {
-                      content: '"✏️"',
-                      mr: 1,
-                    },
-                  }}>
-                  {item}
-                </Typography>
-              )
-            )}
+                  ) : (
+                    <Typography
+                      key={item + index}
+                      variant='body1'
+                      sx={{
+                        "&::before": {
+                          content: '"✏️"',
+                          mr: 1,
+                        },
+                      }}>
+                      {item}
+                    </Typography>
+                  )}
+                </ListItemButton>
+                {index < o.length - 1 && <Divider />}
+              </Fragment>
+            ))}
           </Stack>
           <Typography variant='body2' sx={{ flex: 0.3 }}>
             {minutes.note || "No Memo"}

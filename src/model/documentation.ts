@@ -18,6 +18,7 @@ export default class Documentation {
 
   constructor() {
     this.temp = this.initialize();
+    this.saveAll();
   }
 
   /* document functions */

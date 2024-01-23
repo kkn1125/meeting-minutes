@@ -21,9 +21,10 @@ import {
   useRef,
   useState,
 } from "react";
-import { InitialValues } from "../../model/minutes";
+import { CONTENT_TYPE, InitialValues } from "../../model/minutes";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import LinkIcon from "@mui/icons-material/Link";
 
 type ContentListFieldProps = {
   name: string;
@@ -43,7 +44,7 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [formik.values.contents]);
+  }, [formik.values?.contents]);
 
   useEffect(() => {
     // console.log(isMobile ? "mobile" : "desktop");
@@ -72,7 +73,7 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
       window.removeEventListener("drop", handleDragEnd);
       window.removeEventListener("keydown", handleEscapeDrag);
     };
-  }, [formik.values.contents]);
+  }, [formik.values?.contents]);
 
   function handleEscapeDrag(e: DragEvent) {
     if (e.dataTransfer.dropEffect === "none") {
@@ -156,7 +157,10 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
   }
 
   function handleAddItem(index: number) {
-    formik.values.contents.splice(index + 1, 0, { item: "" });
+    formik.values.contents.splice(index + 1, 0, {
+      item: "",
+      type: CONTENT_TYPE.TEXT,
+    });
     formik.setFieldValue("contents", formik.values.contents);
     setTimeout(() => {
       const inputs = [...focusRef.current.querySelectorAll("input")];
@@ -171,7 +175,7 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
       formik.setFieldValue("contents", formik.values.contents);
       setTimeout(() => {
         const inputs = [...focusRef.current.querySelectorAll("input")];
-        const num = index || inputs.length - 1;
+        const num = (index - 1 < 0 ? 0 : index - 1) || inputs.length - 1;
         inputs[num > 0 ? num : 0].focus();
       }, 50);
     }
@@ -189,6 +193,7 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
       (formik.values.contents[index].item === "" ||
         formik.values.contents[index].item.startsWith("data:image/"))
     ) {
+      e.preventDefault();
       handleRemoveItem(index);
     } else if (e.key === "ArrowUp") {
       setTimeout(() => {
@@ -226,7 +231,10 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
 
         const url = canvas.toDataURL(file.type, 1.0);
         image.remove();
-        formik.values.contents.splice(index, 1, { item: url });
+        formik.values.contents.splice(index, 1, {
+          item: url,
+          type: CONTENT_TYPE.IMAGE,
+        });
         formik.setFieldValue("contents", formik.values.contents);
       };
     } else if (text) {
@@ -256,6 +264,7 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
         const data = [...formik.values.contents];
         data.push({
           item: text.trim(),
+          type: CONTENT_TYPE.TEXT,
         });
         formik.setFieldValue("contents", data);
       }
@@ -266,6 +275,7 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
     if (confirm("이미지를 제거하시겠습니까?")) {
       formik.values.contents.splice(index, 1, {
         item: "",
+        type: CONTENT_TYPE.TEXT,
       });
       formik.setFieldValue("contents", formik.values.contents);
     }
@@ -290,12 +300,15 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
 
   return (
     <Stack ref={focusRef} flex={1} gap={2} id='content-panel'>
-      {formik.values.contents.map(({ item }, index, o) => (
+      {formik.values?.contents.map(({ item }, index, o) => (
         <Fragment key={index}>
           <Stack
             draggable
-            direction='row'
-            alignItems={"center"}
+            direction={{ xs: "column", lg: "row" }}
+            alignItems={{
+              xs: "flex-start",
+              lg: "center",
+            }}
             gap={1}
             data-index={index}
             sx={
@@ -332,7 +345,12 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
                   }
                 : {}
             }>
-            <Stack direction='row' alignItems='center' gap={1} flex={1}>
+            <Stack
+              direction='row'
+              alignItems='center'
+              gap={1}
+              flex={1}
+              sx={{ width: "100%" }}>
               {!isMobile ? (
                 <Tooltip title='move' placement='left'>
                   <Stack
@@ -358,7 +376,6 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
                   </Button>
                 </Stack>
               )}
-
               {item.startsWith("data:image/") ? (
                 <Stack flex={1} gap={1}>
                   <TextField
@@ -389,7 +406,6 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
                   placeholder='내용을 작성하세요!'
                   fullWidth
                   label='항목'
-                  rows={10}
                   value={item}
                   onKeyDown={handleKeyEvent}
                   onBlur={formik.handleBlur}
@@ -397,11 +413,13 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
                   onPaste={(e) => handleImagePaste(e, index)}
                 />
               )}
+            </Stack>
+            <Stack direction='row' gap={0.2}>
               <IconButton onClick={() => handleAddItem(index)}>
-                <AddIcon />
+                <AddIcon fontSize='small' />
               </IconButton>
               <IconButton onClick={() => handleRemoveItem(index)}>
-                <RemoveIcon />
+                <RemoveIcon fontSize='small' />
               </IconButton>
             </Stack>
           </Stack>

@@ -1,8 +1,15 @@
 import { v4 } from "uuid";
 import { format } from "../util/features";
 
+export enum CONTENT_TYPE {
+  TEXT = "text",
+  LINK = "link",
+  IMAGE = "image",
+}
+
 export type Content = {
   item: string;
+  type: CONTENT_TYPE;
 };
 export type AutoComplete = {
   name: string;
@@ -56,13 +63,33 @@ export default class Minutes {
         createdAt,
         updatedAt,
       } = minutes;
+      const convertContents = contents.map(({ item, type }) => {
+        if (item.startsWith("data:image/")) {
+          return {
+            item,
+            type: CONTENT_TYPE.IMAGE,
+          };
+        } else if (item.startsWith("http://") || item.startsWith("https://")) {
+          return {
+            item,
+            type: CONTENT_TYPE.LINK,
+          };
+        } else {
+          return {
+            item,
+            type: CONTENT_TYPE.TEXT,
+          };
+        }
+      });
       this.id = id || v4();
       this.category = category;
       this.title = title;
       this.topic = topic;
       this.minutesDate = minutesDate;
       this.participants = participants;
-      this.contents = contents.filter((content) => content.item.length > 0);
+      this.contents = convertContents.filter(
+        (content) => content.item.length > 0
+      );
       this.note = note;
       this.createdAt = createdAt || currentTime;
       this.updatedAt = updatedAt || currentTime;

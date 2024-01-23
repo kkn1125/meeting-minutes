@@ -66,7 +66,7 @@ function TagField({ name, formik }: TagFieldProps) {
           py: 1.5,
           height: 56,
         }}>
-        {formik.values.participants.map(({ name }, index) => (
+        {formik.values?.participants.map(({ name }, index) => (
           <Chip key={index} label={name} onDelete={() => handleDelete(index)} />
         ))}
         <TextField

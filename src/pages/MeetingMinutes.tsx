@@ -10,7 +10,7 @@ import {
   createFilterOptions,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { useEffect, useMemo, useRef } from "react";
+import { MouseEvent, useEffect, useMemo, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import ContentListField from "../components/atoms/ContentListField";
@@ -18,7 +18,11 @@ import DateField from "../components/atoms/DateField";
 import TagField from "../components/atoms/TagField";
 import { Category } from "../model/documentation";
 import { DocumentationManager } from "../model/documentation.manager";
-import Minutes, { InitialValues, MinutesType } from "../model/minutes";
+import Minutes, {
+  CONTENT_TYPE,
+  InitialValues,
+  MinutesType,
+} from "../model/minutes";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
 
@@ -30,7 +34,7 @@ const initialValues: InitialValues = {
   topic: "",
   minutesDate: format(new Date(), "YYYY-MM-ddTHH:mm:ss.SSS"),
   participants: [],
-  contents: [{ item: "" }],
+  contents: [{ item: "", type: CONTENT_TYPE.TEXT }],
   note: "",
 };
 
@@ -81,9 +85,9 @@ function MeetingMinutes() {
     validationSchema,
     validate(values) {
       const errors: Partial<{ [key in keyof InitialValues]: string }> = {};
-      if (values.minutesDate === null) {
+      if (values?.minutesDate === null) {
         errors.minutesDate = "시간을 표시해주세요.";
-      } else if (new Date(values.minutesDate).toString() === "Invalid Date") {
+      } else if (new Date(values?.minutesDate).toString() === "Invalid Date") {
         errors.minutesDate = "잘못된 시간 형식입니다.";
       }
       return errors;
@@ -106,7 +110,7 @@ function MeetingMinutes() {
 
   const categoryOptions = useMemo(() => {
     return docuManager.documentation.categories;
-  }, [formik.values.category]);
+  }, [formik.values?.category]);
 
   const defaultCategory = useMemo(() => {
     const defaultValue =
@@ -114,12 +118,17 @@ function MeetingMinutes() {
       docuManager.documentation.categories?.[0]?.inputValue;
     formik.setFieldValue("category", defaultValue);
     return defaultValue;
-  }, [formik.values.category]);
+  }, [formik.values?.category]);
 
   useEffect(() => {
     if (params.id) {
       const minutes = docuManager.findOne(params.id);
-      formik.setValues(minutes);
+      if (minutes) {
+        formik.setValues(minutes);
+      } else {
+        alert("잘못된 접근입니다.");
+        navigate(BASE);
+      }
     } else {
       formik.setValues(initialValues);
     }
@@ -138,6 +147,15 @@ function MeetingMinutes() {
 
   function handleRemoveCategory(index: number) {
     docuManager.documentation.removeCategory(index);
+  }
+
+  function handleClearFormData(e: MouseEvent) {
+    if (!confirm("내용을 모두 지우시겠습니까?")) return;
+    formik.setValues(initialValues);
+  }
+
+  function handleCancel(e: MouseEvent) {
+    navigate(-1);
   }
 
   return (
@@ -270,7 +288,7 @@ function MeetingMinutes() {
               label='주제'
               variant='outlined'
               fullWidth
-              value={formik.values.title}
+              value={formik.values?.title}
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
               error={formik.touched.title && Boolean(formik.errors.title)}
@@ -287,7 +305,7 @@ function MeetingMinutes() {
               label='목표'
               variant='outlined'
               fullWidth
-              value={formik.values.topic}
+              value={formik.values?.topic}
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
               error={formik.touched.topic && Boolean(formik.errors.topic)}
@@ -320,7 +338,7 @@ function MeetingMinutes() {
                 variant='outlined'
                 fullWidth
                 type='number'
-                value={formik.values.participants.length}
+                value={formik.values?.participants.length}
                 sx={{
                   width: 110,
                 }}
@@ -350,7 +368,7 @@ function MeetingMinutes() {
             multiline
             rows={10}
             sx={{ flex: 0.35 }}
-            value={formik.values.note}
+            value={formik.values?.note}
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
             error={formik.touched.note && Boolean(formik.errors.note)}
@@ -364,22 +382,56 @@ function MeetingMinutes() {
           />
         </Stack>
 
-        <Stack direction='row'>
-          <Button
-            color='success'
-            variant='contained'
-            type='submit'
-            sx={{
-              flex: {
-                xs: 1,
-                md: 0,
-              },
-              px: 5,
-              color: "white",
-              borderRadius: "100px",
-            }}>
-            {params.id ? "update" : "add"}
-          </Button>
+        <Stack
+          direction={{ xs: "column", lg: "row" }}
+          justifyContent={"space-between"}
+          gap={1}>
+          <Stack direction='row' gap={1}>
+            <Button
+              color='success'
+              variant='contained'
+              type='submit'
+              sx={{
+                flex: {
+                  xs: 1,
+                  md: 0,
+                },
+                px: 5,
+                color: "white",
+                borderRadius: "100px",
+              }}>
+              {params.id ? "update" : "add"}
+            </Button>
+            <Button
+              color='inherit'
+              variant='contained'
+              type='button'
+              onClick={handleCancel}
+              sx={{
+                flex: {
+                  xs: 1,
+                  md: 0,
+                },
+                px: 5,
+                color: "white",
+                borderRadius: "100px",
+              }}>
+              {params.id ? "cancel" : "cancel"}
+            </Button>
+          </Stack>
+          <Stack direction='row'>
+            <Button
+              color='warning'
+              variant='contained'
+              sx={{
+                color: "white",
+                borderRadius: "100px",
+              }}
+              type='button'
+              onClick={handleClearFormData}>
+              {params.id ? "clear" : "clear"}
+            </Button>
+          </Stack>
         </Stack>
       </Stack>
     </Box>

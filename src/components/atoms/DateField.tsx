@@ -23,7 +23,7 @@ export default function DateField({ name, formik }: DateFieldProps) {
         <DateTimePicker
           name={name}
           label='날짜'
-          value={dayjs(formik.values.minutesDate)}
+          value={dayjs(formik.values?.minutesDate)}
           onChange={(date: Dayjs, { validationError }) => {
             formik.setFieldValue(name, date?.toDate() || null);
           }}
