@@ -208,28 +208,46 @@ function MeetingMinutesViewer() {
           <Stack flex={1} gap={2}>
             {minutes.contents.map(({ item }, index) =>
               item.startsWith("data:image/") ? (
-                <Stack key={item + index}>
-                  <Box
-                    component='img'
-                    src={item}
-                    sx={{
-                      width: "100%",
-                    }}
-                  />
-                  <Typography
-                    align='center'
-                    variant='body2'
-                    sx={{
-                      p: 1,
-                      backgroundColor: (theme) =>
-                        theme.palette.background.paper,
-                      color: (theme) => theme.palette.text.secondary,
-                    }}>
-                    image
-                  </Typography>
+                <Stack
+                  key={item + index}
+                  direction='row'
+                  gap={1}
+                  sx={{
+                    "&::before": {
+                      content: '"🖼️"',
+                    },
+                  }}>
+                  <Stack>
+                    <Box
+                      component='img'
+                      src={item}
+                      sx={{
+                        width: "100%",
+                      }}
+                    />
+                    <Typography
+                      align='center'
+                      variant='body2'
+                      sx={{
+                        p: 1,
+                        backgroundColor: (theme) =>
+                          theme.palette.background.paper,
+                        color: (theme) => theme.palette.text.secondary,
+                      }}>
+                      image
+                    </Typography>
+                  </Stack>
                 </Stack>
               ) : (
-                <Typography key={item + index} variant='body1'>
+                <Typography
+                  key={item + index}
+                  variant='body1'
+                  sx={{
+                    "&::before": {
+                      content: '"✏️"',
+                      mr: 1,
+                    },
+                  }}>
                   {item}
                 </Typography>
               )

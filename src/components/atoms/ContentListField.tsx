@@ -39,13 +39,13 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
 
   function handleRemoveItem(index: number) {
     if (formik.values.contents.length > 1) {
-      setTimeout(() => {
-        const inputs = [...focusRef.current.querySelectorAll("input")];
-        const num = inputs.length - 1;
-        inputs[num > 0 ? num : 0].focus();
-      }, 50);
       formik.values.contents.splice(index, 1);
       formik.setFieldValue("contents", formik.values.contents);
+      setTimeout(() => {
+        const inputs = [...focusRef.current.querySelectorAll("input")];
+        const num = index || inputs.length - 1;
+        inputs[num > 0 ? num : 0].focus();
+      }, 50);
     }
   }
 
@@ -81,7 +81,7 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
   function handleImagePaste(e: ClipboardEvent, index: number) {
     e.preventDefault();
     const file = e.clipboardData.files[0];
-
+    const text = e.clipboardData.getData("text/plain");
     if (file) {
       const image = new Image();
       image.src = URL.createObjectURL(file);
@@ -101,6 +101,36 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
         formik.values.contents.splice(index, 1, { item: url });
         formik.setFieldValue("contents", formik.values.contents);
       };
+    } else if (text) {
+      if (text.match(/[\n\r]/gm)) {
+        formik.values.contents.splice(index, 1);
+        const data = [];
+        for (const t of text.split(/[\n\r]+/gm)) {
+          const trimText = t.trim();
+          if (trimText.startsWith("-")) {
+            const word = trimText.slice(trimText.indexOf("-") + 1);
+            data.push({
+              item: word.trim(),
+            });
+          } else if (trimText.startsWith("•")) {
+            const word = trimText.slice(trimText.indexOf("•") + 1);
+            data.push({
+              item: word.trim(),
+            });
+          } else {
+            data.push({
+              item: trimText,
+            });
+          }
+        }
+        formik.setFieldValue("contents", [...formik.values.contents, ...data]);
+      } else {
+        const data = [...formik.values.contents];
+        data.push({
+          item: text.trim(),
+        });
+        formik.setFieldValue("contents", data);
+      }
     }
   }
 
