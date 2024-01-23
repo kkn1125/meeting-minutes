@@ -238,6 +238,7 @@ function MenuItems() {
                       dataDispatch({
                         type: DATA_ACTION.LOAD,
                       });
+                      navigate(BASE);
                     }}>
                     <ListItemIcon>
                       <DeleteForeverIcon fontSize='small' />
