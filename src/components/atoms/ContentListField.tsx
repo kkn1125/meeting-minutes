@@ -160,7 +160,8 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
     formik.setFieldValue("contents", formik.values.contents);
     setTimeout(() => {
       const inputs = [...focusRef.current.querySelectorAll("input")];
-      inputs?.[index - 1]?.focus();
+      const num = inputs.length - 1 < index + 1 ? inputs.length - 1 : index + 1;
+      inputs?.[num]?.focus();
     }, 50);
   }
 
