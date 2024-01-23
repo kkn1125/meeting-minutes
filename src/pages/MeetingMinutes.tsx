@@ -94,6 +94,7 @@ function MeetingMinutes() {
       );
 
       if (params.id) {
+        minutes.udpateTimestamp();
         docuManager.update(params.id, minutes);
         navigate(`${BASE}meeting-minutes/view?id=${params.id}`);
       } else {

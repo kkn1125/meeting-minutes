@@ -1,8 +1,17 @@
 import AddIcon from "@mui/icons-material/Add";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { Avatar, Box, IconButton, Stack, TextField } from "@mui/material";
+import { Box, IconButton, Stack, TextField, Tooltip } from "@mui/material";
 import { FormikProps } from "formik";
-import { ChangeEvent, ClipboardEvent, KeyboardEvent, useRef } from "react";
+import {
+  ChangeEvent,
+  ClipboardEvent,
+  Fragment,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { InitialValues } from "../../model/minutes";
 
 type ContentListFieldProps = {
@@ -11,7 +20,86 @@ type ContentListFieldProps = {
 };
 
 function ContentListField({ name, formik }: ContentListFieldProps) {
+  const dragIndex = useRef(-1);
+  const [dragNum, setDragNum] = useState(-1);
   const focusRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    window.addEventListener("dragstart", handleDragStart);
+    window.addEventListener("dragover", handleDragMove);
+    window.addEventListener("drop", handleDragEnd);
+    window.addEventListener("dragend", handleEscapeDrag);
+    return () => {
+      window.removeEventListener("dragstart", handleDragStart);
+      window.removeEventListener("dragover", handleDragMove);
+      window.removeEventListener("drop", handleDragEnd);
+      window.removeEventListener("keydown", handleEscapeDrag);
+    };
+  }, [formik.values.contents]);
+
+  function handleEscapeDrag(e: DragEvent) {
+    if (e.dataTransfer.dropEffect === "none") {
+      e.dataTransfer.clearData();
+      setDragNum(() => -1);
+      dragIndex.current = -1;
+    }
+  }
+
+  function handleDragStart(e: DragEvent) {
+    const target = e.target as HTMLDivElement;
+    const draggableEl = target.closest("[draggable]") as HTMLDivElement;
+    const index = draggableEl.dataset.index;
+    e.dataTransfer.clearData();
+    e.dataTransfer.setData("origin", index);
+  }
+
+  function handleDragEnd(e: DragEvent) {
+    const indexString = e.dataTransfer.getData("origin");
+    const origin = Number(indexString);
+    const dragIndexNum = dragIndex.current;
+
+    if (dragIndexNum !== -1) {
+      const isOver = origin < dragIndexNum;
+      const [item] = formik.values.contents.splice(origin, 1);
+      if (item) {
+        const sliceIndex = dragIndexNum - (isOver ? 1 : 0);
+        formik.values.contents.splice(sliceIndex > 0 ? sliceIndex : 0, 0, item);
+        formik.setFieldValue("contents", formik.values.contents);
+      }
+    }
+    setDragNum(() => -1);
+    dragIndex.current = -1;
+    e.dataTransfer.clearData();
+  }
+
+  function handleDragMove(e: DragEvent) {
+    const target = e.target as HTMLDivElement;
+    const draggableEl = target.closest("[draggable]") as HTMLDivElement;
+    if (draggableEl) {
+      const { height } = draggableEl.getBoundingClientRect();
+      const index = Number(draggableEl.dataset.index);
+      if (height / 2 > e.offsetY) {
+        // 상단
+        setDragNum(() => index);
+        dragIndex.current = index;
+      } else {
+        // 하단
+        setDragNum(() =>
+          index + 1 > formik.values.contents.length
+            ? formik.values.contents.length
+            : index + 1
+        );
+        dragIndex.current =
+          index + 1 > formik.values.contents.length
+            ? formik.values.contents.length
+            : index + 1;
+      }
+    } else {
+      dragIndex.current = -1;
+      setDragNum(() => -1);
+    }
+    e.preventDefault();
+  }
 
   function handleEachItemUpdate(e: ChangeEvent, index: number) {
     const target = e.target as HTMLInputElement;
@@ -144,54 +232,103 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
   }
 
   return (
-    <Stack ref={focusRef} flex={1} gap={2}>
-      {formik.values.contents.map(({ item }, index) => (
-        <Stack key={index} direction='row' alignItems={"center"} gap={1}>
-          {item.startsWith("data:image/") ? (
-            <Stack flex={1} gap={1}>
-              <TextField
-                autoComplete='off'
-                disabled
-                placeholder='내용을 작성하세요!'
-                fullWidth
-                label='항목'
-                rows={10}
-                value={item}
-                onKeyDown={handleKeyEvent}
-                onBlur={formik.handleBlur}
-                onChange={(e) => handleEachItemUpdate(e, index)}
-                onPaste={(e) => handleImagePaste(e, index)}
-              />
-              <Box
-                component='img'
-                src={item}
-                onClick={() => handleRemoveImage(index)}
-                sx={{
-                  maxWidth: 300,
-                }}
-              />
+    <Stack ref={focusRef} flex={1} gap={2} id='content-panel'>
+      {formik.values.contents.map(({ item }, index, o) => (
+        <Fragment key={index}>
+          <Stack
+            draggable
+            direction='row'
+            alignItems={"center"}
+            gap={1}
+            data-index={index}
+            sx={{
+              ...(dragNum === index && {
+                position: "relative",
+                "&::before": {
+                  content: '""',
+                  display: "block",
+                  position: "absolute",
+                  left: 80,
+                  right: 150,
+                  top: -8,
+                  p: 0.3,
+                  borderTop: (theme) =>
+                    `1px dashed ${theme.palette.text.primary}`,
+                },
+              }),
+              ...(dragNum === index + 1 && {
+                position: "relative",
+                "&::after": {
+                  content: '""',
+                  display: "block",
+                  position: "absolute",
+                  left: 80,
+                  right: 150,
+                  bottom: -8,
+                  p: 0.3,
+                  borderBottom: (theme) =>
+                    `1px dashed ${theme.palette.text.primary}`,
+                },
+              }),
+            }}>
+            <Stack direction='row' alignItems='center' gap={1} flex={1}>
+              <Tooltip title='move' placement='left'>
+                <Stack
+                  sx={{
+                    "&:hover": {
+                      cursor: "move",
+                    },
+                  }}>
+                  <DragIndicatorIcon />
+                </Stack>
+              </Tooltip>
+              {item.startsWith("data:image/") ? (
+                <Stack flex={1} gap={1}>
+                  <TextField
+                    autoComplete='off'
+                    disabled
+                    placeholder='내용을 작성하세요!'
+                    fullWidth
+                    label='항목'
+                    rows={10}
+                    value={item}
+                    onKeyDown={handleKeyEvent}
+                    onBlur={formik.handleBlur}
+                    onChange={(e) => handleEachItemUpdate(e, index)}
+                    onPaste={(e) => handleImagePaste(e, index)}
+                  />
+                  <Box
+                    component='img'
+                    src={item}
+                    onClick={() => handleRemoveImage(index)}
+                    sx={{
+                      maxWidth: 300,
+                    }}
+                  />
+                </Stack>
+              ) : (
+                <TextField
+                  autoComplete='off'
+                  placeholder='내용을 작성하세요!'
+                  fullWidth
+                  label='항목'
+                  rows={10}
+                  value={item}
+                  onKeyDown={handleKeyEvent}
+                  onBlur={formik.handleBlur}
+                  onChange={(e) => handleEachItemUpdate(e, index)}
+                  onPaste={(e) => handleImagePaste(e, index)}
+                />
+              )}
+              <IconButton onClick={() => handleAddItem(index)}>
+                <AddIcon />
+              </IconButton>
+              <IconButton onClick={() => handleRemoveItem(index)}>
+                <RemoveIcon />
+              </IconButton>
             </Stack>
-          ) : (
-            <TextField
-              autoComplete='off'
-              placeholder='내용을 작성하세요!'
-              fullWidth
-              label='항목'
-              rows={10}
-              value={item}
-              onKeyDown={handleKeyEvent}
-              onBlur={formik.handleBlur}
-              onChange={(e) => handleEachItemUpdate(e, index)}
-              onPaste={(e) => handleImagePaste(e, index)}
-            />
-          )}
-          <IconButton onClick={() => handleAddItem(index)}>
-            <AddIcon />
-          </IconButton>
-          <IconButton onClick={() => handleRemoveItem(index)}>
-            <RemoveIcon />
-          </IconButton>
-        </Stack>
+          </Stack>
+        </Fragment>
       ))}
     </Stack>
   );

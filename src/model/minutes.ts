@@ -68,6 +68,10 @@ export default class Minutes {
       this.updatedAt = updatedAt || currentTime;
     }
   }
+  udpateTimestamp() {
+    const currentTime = format(new Date(), "YYYY-MM-ddTHH:mm:ss.SSS");
+    this.updatedAt = currentTime;
+  }
   update(updateMinutes: UpdateValues) {
     const currentTime = format(new Date(), "YYYY-MM-ddTHH:mm:ss.SSS");
     this.id = updateMinutes.id;

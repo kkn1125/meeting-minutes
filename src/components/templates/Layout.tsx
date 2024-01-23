@@ -51,33 +51,14 @@ function Layout() {
   const [breadcrumbs, setBreadcrumbs] = useState<Crumb[]>([]);
 
   useEffect(() => {
-    window.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      document.body.classList.add("dragover");
-    });
-    document.addEventListener("mouseleave", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      document.body.classList.remove("dragover");
-    });
-    window.addEventListener("drop", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const dropFile = e.dataTransfer.files[0];
-
-      if (dropFile && dropFile.type.match(/json/)) {
-        docuManager.import("json", dropFile, () => {
-          dataDispatch({
-            type: DATA_ACTION.LOAD,
-          });
-          alert("등록이 완료되었습니다.");
-        });
-      } else {
-        alert("지원되지 않는 파일 타입입니다.");
-      }
-      document.body.classList.remove("dragover");
-    });
+    window.addEventListener("dragover", handleDragOver);
+    window.addEventListener("drop", handleDrop);
+    document.addEventListener("mouseleave", handleMouseLeave);
+    return () => {
+      window.removeEventListener("dragover", handleDragOver);
+      window.removeEventListener("drop", handleDrop);
+      document.removeEventListener("mouseleave", handleMouseLeave);
+    };
   }, []);
 
   useEffect(() => {
@@ -104,6 +85,40 @@ function Layout() {
     }
     setBreadcrumbs(() => crumblist);
   }, [locate.pathname]);
+
+  function handleDrop(e: DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    const dropFile = e.dataTransfer.files[0];
+    if (dropFile) {
+      if (dropFile.type.match(/json/)) {
+        docuManager.import("json", dropFile, () => {
+          dataDispatch({
+            type: DATA_ACTION.LOAD,
+          });
+          alert("등록이 완료되었습니다.");
+        });
+      } else {
+        alert("지원되지 않는 파일 타입입니다.");
+      }
+    }
+    document.body.classList.remove("dragover");
+  }
+
+  function handleDragOver(e: DragEvent) {
+    if (e.dataTransfer.files.length > 0) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.body.classList.add("dragover");
+      console.log(e);
+    }
+  }
+
+  function handleMouseLeave(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    document.body.classList.remove("dragover");
+  }
 
   return (
     <Stack sx={{ height: "inherit" }}>
