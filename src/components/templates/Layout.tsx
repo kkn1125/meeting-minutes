@@ -10,9 +10,9 @@ import {
   useTheme,
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { DATA_ACTION, DataDispatchContext } from "../../context/DataProvider";
-import { DocumentationManager } from "../../model/documentation.manager";
+import { docuManager } from "../../model/documentation.manager";
 import { BASE } from "../../util/global";
 import DarkModeButton from "../atoms/DarkModeButton";
 import MenuItems from "../moleculars/MenuItems";
@@ -36,10 +36,11 @@ const crumbTo = {
   update: "UPDATE",
   view: "VIEW",
   chart: "CHART",
+  todos: "TODOS",
 };
 
 function Layout() {
-  const docuManager = new DocumentationManager();
+  const navigate = useNavigate();
   const dataDispatch = useContext(DataDispatchContext);
 
   const theme = useTheme();
@@ -51,10 +52,12 @@ function Layout() {
   const [breadcrumbs, setBreadcrumbs] = useState<Crumb[]>([]);
 
   useEffect(() => {
+    navigator.serviceWorker.addEventListener("message", handleWorkerMessage);
     window.addEventListener("dragover", handleDragOver);
     window.addEventListener("drop", handleDrop);
     document.addEventListener("mouseleave", handleMouseLeave);
     return () => {
+      window.removeEventListener("message", handleWorkerMessage);
       window.removeEventListener("dragover", handleDragOver);
       window.removeEventListener("drop", handleDrop);
       document.removeEventListener("mouseleave", handleMouseLeave);
@@ -86,6 +89,19 @@ function Layout() {
     setBreadcrumbs(() => crumblist);
   }, [locate.pathname]);
 
+  function handleWorkerMessage(e: Event) {
+    if ("source" in (e as any).data && (e as any).data.source.match(/react/))
+      return;
+    // console.log((e as any).data);
+    const { type, action, data } = (e as any).data;
+    const { title, body, icon, tag } = data;
+    if (type === "worker") {
+      if (action === "todo/view") {
+        navigate("/todos/view?id=" + tag);
+      }
+    }
+  }
+
   function handleDrop(e: DragEvent) {
     e.preventDefault();
     e.stopPropagation();
@@ -110,7 +126,7 @@ function Layout() {
       e.preventDefault();
       e.stopPropagation();
       document.body.classList.add("dragover");
-      console.log(e);
+      // console.log(e);
     }
   }
 

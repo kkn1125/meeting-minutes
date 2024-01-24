@@ -8,14 +8,13 @@ import {
   ListItemButton,
   Skeleton,
   Stack,
-  TextField,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
 import { Fragment, useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { DocumentationManager } from "../model/documentation.manager";
+import { docuManager } from "../model/documentation.manager";
 import Minutes, { CONTENT_TYPE } from "../model/minutes";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
@@ -24,7 +23,6 @@ function MeetingMinutesViewer() {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
   const navigate = useNavigate();
-  const docuManager = new DocumentationManager();
   const params = Object.fromEntries(useSearchParams()[0].entries());
   const [minutes, setMinutes] = useState<Minutes>(null);
   useEffect(() => {

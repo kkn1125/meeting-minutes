@@ -27,17 +27,17 @@ function Home() {
         }}>
         <Button
           component={Link}
-          to={BASE + "meeting-minutes/add"}
-          variant='contained'
-          color='success'>
-          Write
-        </Button>
-        <Button
-          component={Link}
           to={BASE + "meeting-minutes"}
           variant='contained'
           color='success'>
-          Archive
+          documentation
+        </Button>
+        <Button
+          component={Link}
+          to={BASE + "todos"}
+          variant='contained'
+          color='success'>
+          todo
         </Button>
         <Button
           component={Link}

@@ -1,3 +1,5 @@
+import { BASE } from "./global";
+
 export const format = (time: Date | string, form: string) => {
   const dateTime = new Date(time);
   const year = dateTime.getFullYear();
@@ -30,3 +32,31 @@ export const format = (time: Date | string, form: string) => {
     }
   });
 };
+
+export function sendNotificationToServiceWorker(
+  title: string,
+  body: string,
+  icon: string,
+  id: string
+) {
+  if ("serviceWorker" in navigator && "PushManager" in window) {
+    navigator.serviceWorker.controller.postMessage({
+      type: "notify",
+      data: {
+        title: title,
+        body: body,
+        icon: icon,
+        id,
+      },
+    });
+  }
+}
+
+export function pushMessage(title: string, content: string, id: string) {
+  sendNotificationToServiceWorker(
+    title,
+    content,
+    BASE + "favicon/apple-touch-icon.png",
+    id
+  );
+}

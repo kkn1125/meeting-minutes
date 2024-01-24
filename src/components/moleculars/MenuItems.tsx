@@ -2,17 +2,11 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import GroupsIcon from "@mui/icons-material/Groups";
+import InsertLinkIcon from "@mui/icons-material/InsertLink";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import MenuIcon from "@mui/icons-material/Menu";
 import SaveIcon from "@mui/icons-material/Save";
-import {
-  Avatar,
-  IconButton,
-  ListItemIcon,
-  MenuList,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { IconButton, ListItemIcon, MenuList, Typography } from "@mui/material";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import Grow from "@mui/material/Grow";
 import MenuItem from "@mui/material/MenuItem";
@@ -27,17 +21,13 @@ import {
   useState,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { DocumentationManager } from "../../model/documentation.manager";
 import { DATA_ACTION, DataDispatchContext } from "../../context/DataProvider";
+import { docuManager } from "../../model/documentation.manager";
 import { BASE, MODE } from "../../util/global";
-import InsertLinkIcon from "@mui/icons-material/InsertLink";
-import { v4 } from "uuid";
-import TaskIcon from "@mui/icons-material/Task";
 
 function MenuItems() {
   const [showFile, setShowFile] = useState(false);
   const dataDispatch = useContext(DataDispatchContext);
-  const docuManager = new DocumentationManager();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLButtonElement>(null);

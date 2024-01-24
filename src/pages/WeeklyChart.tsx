@@ -2,7 +2,6 @@
 // TODO: 카카오톡 저장하기 기능 추가
 
 import {
-  Box,
   Button,
   Chip,
   Stack,
@@ -22,7 +21,7 @@ import {
 } from "chart.js";
 import { useEffect, useRef, useState } from "react";
 import { Chart } from "react-chartjs-2";
-import { DocumentationManager } from "../model/documentation.manager";
+import { docuManager } from "../model/documentation.manager";
 import Minutes from "../model/minutes";
 import { format } from "../util/features";
 
@@ -48,7 +47,6 @@ nextMonthTime.setMonth(nextMonthTime.getMonth() + 1);
 function WeeklyChart() {
   const theme = useTheme();
   const chartRef = useRef<ChartJS>(null);
-  const docuManager = new DocumentationManager();
   const [today, setToday] = useState(new Date(_year, _month, _date));
   const [weekDateList, setWeekDateList] = useState([]);
   const [documentations, setDocumentations] = useState<Minutes[][]>([]);

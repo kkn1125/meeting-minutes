@@ -8,6 +8,9 @@ import MeetingMinutesViewer from "./pages/MeetingMinutesViewer.tsx";
 import { BASE } from "./util/global.ts";
 import WeeklyChart from "./pages/WeeklyChart.tsx";
 import Download from "./pages/Download.tsx";
+import Todos from "./pages/Todos.tsx";
+import TodoEditor from "./pages/TodoEditor.tsx";
+import TodoViewer from "./pages/TodoViewer.tsx";
 
 function App() {
   return (
@@ -19,6 +22,11 @@ function App() {
       <Routes>
         <Route path={BASE} element={<Layout />}>
           <Route path='' element={<Home />} />
+          <Route path='todos'>
+            <Route path='' element={<Todos />} />
+            <Route path='add' element={<TodoEditor />} />
+            <Route path='view' element={<TodoViewer />} />
+          </Route>
           <Route path='meeting-minutes'>
             <Route path='' element={<MeetingMinutesList />}></Route>
             <Route path='add' element={<MeetingMinutes />} />

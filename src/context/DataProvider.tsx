@@ -1,11 +1,13 @@
 import { ReactElement, createContext, useReducer } from "react";
-import { DocumentationManager } from "../model/documentation.manager";
+import { docuManager } from "../model/documentation.manager";
 
-const docuManager = new DocumentationManager();
 const documentation = docuManager.documentation;
 
 const initializeValue = {
-  data: [],
+  data: {
+    minutes: [],
+    todos: [],
+  },
   version: 0,
 };
 
@@ -21,7 +23,10 @@ const reducer = (state, action) => {
   switch (action.type) {
     case DATA_ACTION.LOAD:
       return {
-        data: docuManager.findAll(),
+        data: {
+          minutes: docuManager.findAll(),
+          todos: docuManager.todoManager.findAll(),
+        },
         version: state.version + 1,
       };
     case DATA_ACTION.CB:

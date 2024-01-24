@@ -6,12 +6,17 @@ import dayjs, { Dayjs } from "dayjs";
 import { FormikProps } from "formik";
 import { InitialValues } from "../../model/minutes";
 
-type DateFieldProps = {
+type DateFieldProps<T = any> = {
   name: string;
-  formik: FormikProps<InitialValues>;
+  formik: FormikProps<T>;
+  label?: string;
 };
 
-export default function DateField({ name, formik }: DateFieldProps) {
+export default function DateField<T>({
+  name,
+  formik,
+  label = "날짜",
+}: DateFieldProps<T>) {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box
@@ -22,8 +27,8 @@ export default function DateField({ name, formik }: DateFieldProps) {
         }}>
         <DateTimePicker
           name={name}
-          label='날짜'
-          value={dayjs(formik.values?.minutesDate)}
+          label={label}
+          value={dayjs(formik.values?.[name])}
           onChange={(date: Dayjs, { validationError }) => {
             formik.setFieldValue(name, date?.toDate() || null);
           }}
@@ -31,7 +36,7 @@ export default function DateField({ name, formik }: DateFieldProps) {
             width: "inherit",
           }}
         />
-        {formik.touched.minutesDate && Boolean(formik.errors.minutesDate) && (
+        {formik.touched[name] && Boolean(formik.errors[name]) && (
           <FormHelperText
             error
             sx={{
@@ -39,7 +44,7 @@ export default function DateField({ name, formik }: DateFieldProps) {
               top: "100%",
               left: "1em",
             }}>
-            {formik.errors.minutesDate as string}
+            {formik.errors?.[name] as string}
           </FormHelperText>
         )}
       </Box>

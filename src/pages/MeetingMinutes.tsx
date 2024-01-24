@@ -17,7 +17,10 @@ import ContentListField from "../components/atoms/ContentListField";
 import DateField from "../components/atoms/DateField";
 import TagField from "../components/atoms/TagField";
 import { Category } from "../model/documentation";
-import { DocumentationManager } from "../model/documentation.manager";
+import {
+  DocumentationManager,
+  docuManager,
+} from "../model/documentation.manager";
 import Minutes, {
   CONTENT_TYPE,
   InitialValues,
@@ -25,8 +28,6 @@ import Minutes, {
 } from "../model/minutes";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
-
-const docuManager = new DocumentationManager();
 
 const initialValues: InitialValues = {
   category: undefined,

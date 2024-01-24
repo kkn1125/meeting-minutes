@@ -1,7 +1,9 @@
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import {
   Box,
+  Button,
   Chip,
+  Divider,
   List,
   ListItemButton,
   Pagination,
@@ -11,16 +13,18 @@ import {
   Typography,
 } from "@mui/material";
 import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { DataContext } from "../context/DataProvider";
-import { DocumentationManager } from "../model/documentation.manager";
+import {
+  DocumentationManager,
+  docuManager,
+} from "../model/documentation.manager";
 import Minutes from "../model/minutes";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
 
 const LIMIT = 5;
 function MeetingMinutesList() {
-  const docuManager = new DocumentationManager();
   const data = useContext(DataContext);
   const navigate = useNavigate();
   const [minutesList, setMinutesList] = useState<Minutes[]>(null);
@@ -74,12 +78,24 @@ function MeetingMinutesList() {
   }
 
   return (
-    <Stack>
+    <Stack
+      sx={{
+        m: 5,
+      }}>
+      <Stack direction='row'>
+        <Button
+          component={Link}
+          to={BASE + "meeting-minutes/add"}
+          variant='contained'
+          color='success'>
+          Write
+        </Button>
+      </Stack>
+      <Divider sx={{ my: 2 }} />
       <List
         component={Stack}
         gap={1}
         sx={{
-          m: 5,
           minHeight: 280,
         }}>
         {minutesList.length === 0 && (

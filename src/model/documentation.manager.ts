@@ -1,10 +1,19 @@
-import { format } from "../util/features";
+import { format, pushMessage } from "../util/features";
 import Documentation from "./documentation";
 import Minutes from "./minutes";
 import { v4 } from "uuid";
+import Todo from "./todo";
+import TodoManager from "./todo.manager";
+import { todoQueue, todoTimeoutQueue } from "../util/global";
+import Timestamp from "./timestamp";
 
 export class DocumentationManager {
+  private readonly STORAGE_NAME: string = "meeting-minutes";
+  private readonly CATEGORY_STORAGE_NAME: string = "meeting-minutes/categories";
+  private readonly TODO_STORAGE: string = "meeting-minutes/todolist";
+
   documentation: Documentation = new Documentation();
+  todoManager: TodoManager = new TodoManager();
 
   findAll() {
     return this.documentation.findAll();
@@ -49,11 +58,6 @@ export class DocumentationManager {
   }
   jsonToUrl() {
     const jsonUrl = encodeURIComponent(JSON.stringify(this.findAll()));
-    // const blob = new Blob([JSON.stringify(this.findAll(), null, 2)]);
-    // const file = new File([blob], "backup.json", {
-    //   type: "application/json",
-    // });
-    // const url = URL.createObjectURL(file);
     return jsonUrl;
   }
   import(type: string, file: File, cb: () => void) {
@@ -66,7 +70,10 @@ export class DocumentationManager {
   export(type: string) {
     switch (type) {
       case "json":
-        this.download(type, this.findAll());
+        this.download(type, {
+          minutes: this.findAll(),
+          todolist: this.todoManager.findAll(),
+        });
         break;
     }
   }
@@ -74,23 +81,32 @@ export class DocumentationManager {
     const reader = new FileReader();
     reader.onload = (e) => {
       const result = JSON.parse(e.target.result as string);
-      this.documentation.upload(result);
+      const minutes = result["minutes"];
+      const todolist = result["todolist"];
+      this.documentation.upload(minutes);
+      this.todoManager.upload(todolist);
       cb();
     };
     reader.readAsText(file);
   }
-  createBlob(data: Minutes[]) {
+  createBlob(data: Record<"minutes" | "todolist", Minutes[] | Todo[]>) {
     return new Blob([JSON.stringify(data, null, 2)], {
       type: "application/json",
     });
   }
-  createFile(data: Minutes[], type = "json") {
+  createFile(
+    data: Record<"minutes" | "todolist", Minutes[] | Todo[]>,
+    type = "json"
+  ) {
     const filename = "backup-" + v4() + "." + type;
     return new File([this.createBlob(data)], filename, {
       type: "application/json",
     });
   }
-  download(type: string, data: Minutes[]) {
+  download(
+    type: string,
+    data: Record<"minutes" | "todolist", Minutes[] | Todo[]>
+  ) {
     const file = this.createFile(data, type);
     const url = URL.createObjectURL(file);
     const a = document.createElement("a");
@@ -103,3 +119,4 @@ export class DocumentationManager {
     this.documentation.clearAllDocuments();
   }
 }
+export const docuManager = new DocumentationManager();
