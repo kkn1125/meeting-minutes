@@ -243,6 +243,7 @@ function Layout() {
             position: "absolute",
             right: 20,
             bottom: 20,
+            userSelect: "none",
           }}>
           {isAgreeNotification ? (
             <Chip
