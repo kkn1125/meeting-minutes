@@ -1,8 +1,7 @@
 self.addEventListener("push", function (event) {
-  console.log(123);
   if ((event as any).data) {
     const data = (event as any).data?.json() ?? {};
-    console.log(data);
+    // console.log(data);
     const options = {
       body: data.body,
       icon: data.icon,
@@ -16,7 +15,6 @@ self.addEventListener("push", function (event) {
 });
 
 self.addEventListener("notificationclick", function (e) {
-  console.log(e);
   (e as any).notification.close();
   sendToMain((e as any).notification);
   // 알림 클릭 시 필요한 동작을 추가할 수 있습니다.
@@ -26,9 +24,9 @@ self.addEventListener("message", function (event) {
   if (event.data) {
     const { type, data } = event.data;
     const { title, body, icon, id } = data;
-    console.log("서비스 워커가 메시지를 받았습니다: ", {
-      ...data,
-    });
+    // console.log("서비스 워커가 메시지를 받았습니다: ", {
+    //   ...data,
+    // });
     (event as any).waitUntil(
       (self as any).registration
         .showNotification(title, {
@@ -51,13 +49,15 @@ self.addEventListener("message", function (event) {
 
 function sendToMain(notification: Notification) {
   const { title, body, icon, tag } = notification;
-  (self as any).clients.matchAll().then((clients) => {
-    clients.forEach((client) => {
-      client.postMessage({
-        type: "worker",
-        action: "todo/view",
-        data: { title, body, icon, tag },
+  if (tag) {
+    (self as any).clients.matchAll().then((clients) => {
+      clients.forEach((client) => {
+        client.postMessage({
+          type: "worker",
+          action: "todo/view",
+          data: { title, body, icon, tag },
+        });
       });
     });
-  });
+  }
 }

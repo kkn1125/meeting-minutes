@@ -31,14 +31,22 @@ export default class TodoManager {
   addNotification(todo: Todo) {
     const now = new Timestamp();
     const endTime = new Timestamp(todo.endTime);
-    if (now.isBeforeThan(endTime) || !todo.finished) {
+    endTime.removeMs();
+    if (now.isBeforeThan(endTime) || todo.finished === false) {
       todoQueue.push(todo);
       const noticeTime = endTime.getTime() - now.getTime();
       const timeset = setTimeout(
         () => {
           todo.finish();
           pushMessage(todo.title, todo.content, todo.id);
+          const index = todoQueue.findIndex((t) => t.id === todo.id);
+          todoQueue.splice(index, 1);
+          const nIndex = todoTimeoutQueue.findIndex(
+            (n) => n === (timeset as unknown as number)
+          );
+          todoTimeoutQueue.splice(nIndex, 1);
           this.saveAll();
+          clearTimeout(timeset);
         },
         noticeTime < 0 ? 100 : noticeTime
       );
@@ -88,6 +96,11 @@ export default class TodoManager {
     localStorage.setItem(this.TODO_STORAGE, jsonString);
   }
 
+  clearAllTodos() {
+    this.clear();
+    this.todoList = this.save(this.TODO_STORAGE, []);
+  }
+
   /* todo list management */
   findAll() {
     return this.todoList;
@@ -128,7 +141,7 @@ export default class TodoManager {
     this.todoList = this.load();
   }
 
-  update(id: string, values: TodoInitialValues) {
+  update(id: string, values: Todo) {
     const todo = this.findOne(id);
     todo.update(values);
     this.saveAll();

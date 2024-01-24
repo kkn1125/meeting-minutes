@@ -26,6 +26,7 @@ function App() {
             <Route path='' element={<Todos />} />
             <Route path='add' element={<TodoEditor />} />
             <Route path='view' element={<TodoViewer />} />
+            <Route path='update' element={<TodoEditor />} />
           </Route>
           <Route path='meeting-minutes'>
             <Route path='' element={<MeetingMinutesList />}></Route>

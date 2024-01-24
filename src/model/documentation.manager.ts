@@ -57,7 +57,12 @@ export class DocumentationManager {
     this.documentation.saveAll();
   }
   jsonToUrl() {
-    const jsonUrl = encodeURIComponent(JSON.stringify(this.findAll()));
+    const jsonUrl = encodeURIComponent(
+      JSON.stringify({
+        minutes: this.findAll(),
+        todolist: this.todoManager.findAll(),
+      })
+    );
     return jsonUrl;
   }
   import(type: string, file: File, cb: () => void) {
@@ -117,6 +122,7 @@ export class DocumentationManager {
   }
   clearAllDocuments() {
     this.documentation.clearAllDocuments();
+    this.todoManager.clearAllTodos();
   }
 }
 export const docuManager = new DocumentationManager();

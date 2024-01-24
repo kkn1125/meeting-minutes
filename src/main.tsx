@@ -13,7 +13,7 @@ const registerServiceWorker = async () => {
   if ("serviceWorker" in navigator) {
     try {
       const registration = await navigator.serviceWorker.register(
-        "/worker.ts",
+        location.origin + `${BASE}worker.${import.meta.env.DEV ? "ts" : "js"}`,
         {
           scope: BASE,
         }
@@ -24,22 +24,37 @@ const registerServiceWorker = async () => {
         console.log("Service worker installed");
       } else if (registration.active) {
         console.log("Service worker active");
-        Notification.requestPermission().then((result) => {
-          if (result === "granted") {
-            navigator.serviceWorker.ready.then((registration) => {
-              // registration.showNotification("test");
-              // registration.update().then((reslut) => {
-              //   // console.log(result);
-              // });
-            });
-          }
-        });
       }
     } catch (error) {
       console.error(`Registration failed with ${error}`);
     }
   }
 };
+
+Notification.requestPermission().then((result) => {
+  // console.log(result);
+  if (result === "granted") {
+    navigator.serviceWorker.ready.then((registration) => {
+      if (
+        !("minutes-agree" in localStorage) ||
+        localStorage.getItem("minutes-agree") === "false"
+      ) {
+        registration.showNotification("알림", {
+          body: "할 일의 알림 기능이 활성화 되었습니다.",
+          icon: BASE + "favicon/apple-touch-icon.png",
+        });
+        localStorage.setItem("minutes-agree", "true");
+      }
+    });
+  } else if (result === "denied") {
+    if (!("minutes-agree" in localStorage)) {
+      localStorage.setItem("minutes-agree", "false");
+      alert(
+        "알림 기능이 거부되었있습니다. 활성화하시려면 주소줄 좌측을 설정해주세요."
+      );
+    }
+  }
+});
 
 registerServiceWorker();
 

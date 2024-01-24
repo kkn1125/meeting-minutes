@@ -1,5 +1,5 @@
 import { Box, Button, Stack, TextField } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { MouseEvent, useEffect } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -8,6 +8,7 @@ import { format } from "../util/features";
 import Todo, { TodoInitialValues, TodoType } from "../model/todo";
 import DateField from "../components/atoms/DateField";
 import { docuManager } from "../model/documentation.manager";
+import Timestamp from "../model/timestamp";
 
 const initialValues: TodoInitialValues = {
   title: "",
@@ -48,10 +49,17 @@ function TodoEditor() {
     },
     onSubmit: (values) => {
       if (params.id) {
-        docuManager.todoManager.update(params.id, new Todo(values as TodoType));
+        const todo = new Todo(values as TodoType);
+        const endTime = new Timestamp(todo.endTime);
+        const now = new Timestamp();
+        if (now.isAfterThan(endTime)) {
+          todo.unfinish();
+        }
+        docuManager.todoManager.update(params.id, todo);
         navigate(`${BASE}todos/view?id=${params.id}`);
       } else {
-        docuManager.todoManager.add(new Todo(values as TodoInitialValues));
+        const todo = new Todo(values);
+        docuManager.todoManager.add(todo);
         navigate(`${BASE}todos`);
       }
     },
@@ -59,11 +67,16 @@ function TodoEditor() {
 
   useEffect(() => {
     if (params.id) {
-      // if (minutes) {
-      // } else {
-      //   alert("잘못된 접근입니다.");
-      //   navigate(BASE);
-      // }
+      const todo = docuManager.todoManager.findOne(params.id);
+      if (todo) {
+        formik.setFieldValue("title", todo.title);
+        formik.setFieldValue("content", todo.content);
+        formik.setFieldValue("startTime", todo.startTime);
+        formik.setFieldValue("endTime", todo.endTime);
+      } else {
+        alert("잘못된 접근입니다.");
+        navigate(BASE);
+      }
     } else {
       formik.setValues(initialValues);
     }
@@ -128,11 +141,40 @@ function TodoEditor() {
             <DateField name='startTime' formik={formik} label='시작 시작' />
             <DateField name='endTime' formik={formik} label='종료 시작' />
           </Stack>
-          <Box>
-            <Button type='submit' variant='contained'>
-              추가
+          <Stack direction='row' gap={1}>
+            <Button
+              color='success'
+              type='submit'
+              variant='contained'
+              sx={{
+                color: "white",
+                borderRadius: "100px",
+              }}>
+              {params.id ? "update" : "add"}
             </Button>
-          </Box>
+            <Button
+              color='inherit'
+              variant='contained'
+              type='button'
+              onClick={handleCancel}
+              sx={{
+                color: "white",
+                borderRadius: "100px",
+              }}>
+              {params.id ? "cancel" : "cancel"}
+            </Button>
+            <Button
+              color='warning'
+              type='button'
+              variant='contained'
+              onClick={handleClearFormData}
+              sx={{
+                color: "white",
+                borderRadius: "100px",
+              }}>
+              clear
+            </Button>
+          </Stack>
         </Stack>
       </Stack>
     </Box>

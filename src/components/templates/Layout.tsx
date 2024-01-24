@@ -3,6 +3,7 @@ import {
   Avatar,
   Box,
   Breadcrumbs,
+  Chip,
   Paper,
   Stack,
   Typography,
@@ -40,6 +41,7 @@ const crumbTo = {
 };
 
 function Layout() {
+  const [isAgreeNotification, setIsAgreeNotification] = useState(false);
   const navigate = useNavigate();
   const dataDispatch = useContext(DataDispatchContext);
 
@@ -89,6 +91,17 @@ function Layout() {
     setBreadcrumbs(() => crumblist);
   }, [locate.pathname]);
 
+  useEffect(() => {
+    if (!("minutes-agree" in localStorage)) {
+      setIsAgreeNotification(false);
+    } else {
+      const isAgree = JSON.parse(
+        localStorage.getItem("minutes-agree") || "false"
+      );
+      setIsAgreeNotification(isAgree);
+    }
+  }, [localStorage.getItem("minutes-agree")]);
+
   function handleWorkerMessage(e: Event) {
     if ("source" in (e as any).data && (e as any).data.source.match(/react/))
       return;
@@ -97,7 +110,7 @@ function Layout() {
     const { title, body, icon, tag } = data;
     if (type === "worker") {
       if (action === "todo/view") {
-        navigate("/todos/view?id=" + tag);
+        navigate(`${BASE}todos/view?id=${tag}`);
       }
     }
   }
@@ -204,6 +217,39 @@ function Layout() {
           }}>
           <Outlet />
         </Paper>
+      </Box>
+      <Box
+        sx={{
+          position: "relative",
+        }}>
+        <Box
+          sx={{
+            position: "absolute",
+            right: 20,
+            bottom: 20,
+          }}>
+          {isAgreeNotification ? (
+            <Chip
+              size='small'
+              label='알림 활성화'
+              color='success'
+              sx={{
+                fontSize: (theme) => theme.typography.pxToRem(10),
+                fontWeight: 700,
+              }}
+            />
+          ) : (
+            <Chip
+              size='small'
+              label='알림 비활성화'
+              color='warning'
+              sx={{
+                fontSize: (theme) => theme.typography.pxToRem(10),
+                fontWeight: 700,
+              }}
+            />
+          )}
+        </Box>
       </Box>
       <Footer />
     </Stack>

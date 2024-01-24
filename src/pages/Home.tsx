@@ -20,7 +20,7 @@ function Home() {
         <Typography variant='h3'>Meeting Minutes</Typography>
       </Box>
       <Stack
-        direction='row'
+        direction={{ xs: "column", lg: "row" }}
         gap={2}
         sx={{
           p: 5,

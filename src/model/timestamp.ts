@@ -10,6 +10,7 @@ export default class Timestamp extends Date {
     this.setSeconds(timestamp.getSeconds());
     this.setMilliseconds(timestamp.getMilliseconds());
   }
+
   addYear(year: number) {
     this.setFullYear(this.getFullYear() + year);
   }
@@ -40,6 +41,10 @@ export default class Timestamp extends Date {
     minute && this.addMinute(minute);
     second && this.addSecond(second);
     ms && this.addMilliSecond(ms);
+  }
+
+  removeMs() {
+    this.setMilliseconds(0);
   }
 
   compare(timestamp: Timestamp) {

@@ -41,7 +41,7 @@ function TodoViewer() {
   function handleRemove(id: string) {
     if (!confirm("알림를 삭제하면 복구가 불가능합니다. 정말 삭제하시겠습니까?"))
       return;
-    docuManager.remove(id);
+    docuManager.todoManager.remove(id);
     navigate(`${BASE}todos`);
   }
 
