@@ -59,6 +59,10 @@ function Layout() {
     window.addEventListener("drop", handleDrop);
     document.addEventListener("mouseleave", handleMouseLeave);
     return () => {
+      navigator.serviceWorker.removeEventListener(
+        "message",
+        handleWorkerMessage
+      );
       window.removeEventListener("message", handleWorkerMessage);
       window.removeEventListener("dragover", handleDragOver);
       window.removeEventListener("drop", handleDrop);
@@ -113,6 +117,10 @@ function Layout() {
         navigate(`${BASE}todos/view?id=${tag}`);
       }
     }
+
+    dataDispatch({
+      type: DATA_ACTION.LOAD,
+    });
   }
 
   function handleDrop(e: DragEvent) {
