@@ -52,6 +52,8 @@ Notification.requestPermission().then((result) => {
       alert(
         "알림 기능이 거부되었있습니다. 활성화하시려면 주소줄 좌측을 설정해주세요."
       );
+    } else {
+      localStorage.setItem("minutes-agree", "false");
     }
   }
 });
