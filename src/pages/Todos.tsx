@@ -31,7 +31,7 @@ function Todos() {
 
   useEffect(() => {
     setTodosList(docuManager.todoManager.findAll());
-  }, [data.data, data.version]);
+  }, [data, setTodosList]);
 
   function handleNavigatePage(e: ChangeEvent<unknown>, value: number) {
     navigate(`?page=${value}`);

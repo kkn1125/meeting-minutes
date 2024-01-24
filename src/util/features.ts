@@ -60,3 +60,7 @@ export function pushMessage(title: string, content: string, id: string) {
     id
   );
 }
+
+export function isMobile() {
+  return !!navigator.userAgent.match(/android|mobile|iphone/gi);
+}

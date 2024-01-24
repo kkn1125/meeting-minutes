@@ -50,8 +50,13 @@ function TodoEditor() {
     onSubmit: (values) => {
       if (params.id) {
         const todo = new Todo(values as TodoType);
+        const startTime = new Timestamp(todo.startTime);
         const endTime = new Timestamp(todo.endTime);
+        startTime.removeSecond();
+        startTime.removeMs();
+        endTime.removeSecond();
         endTime.removeMs();
+        todo.startTime = startTime.toString();
         todo.endTime = endTime.toString();
         const now = new Timestamp();
         if (now.isAfterThan(endTime)) {
@@ -61,8 +66,13 @@ function TodoEditor() {
         navigate(`${BASE}todos/view?id=${params.id}`);
       } else {
         const todo = new Todo(values);
+        const startTime = new Timestamp(todo.startTime);
         const endTime = new Timestamp(todo.endTime);
+        startTime.removeSecond();
+        startTime.removeMs();
+        endTime.removeSecond();
         endTime.removeMs();
+        todo.startTime = startTime.toString();
         todo.endTime = endTime.toString();
         docuManager.todoManager.add(todo);
         navigate(`${BASE}todos`);

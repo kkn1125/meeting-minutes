@@ -1,16 +1,30 @@
-import { pushMessage } from "../util/features";
+import { isMobile, pushMessage } from "../util/features";
 import { todoQueue, todoTimeoutQueue } from "../util/global";
 import Timestamp from "./timestamp";
-import Todo, { TodoInitialValues, TodoType } from "./todo";
+import Todo from "./todo";
 
 export default class TodoManager {
   private readonly TODO_STORAGE: string = "meeting-minutes/todolist";
 
   todoList: Todo[] = [];
 
+  events: Record<string, ((data: TodoManager) => void)[]> = {};
+
   constructor() {
     this.initialize();
   }
+
+  // on(key: string, event: (data: TodoManager) => void) {
+  //   if (!this.events[key])
+  //     this.events[key] = [] as ((data: TodoManager) => void)[];
+  //   this.events[key].push(event);
+  // }
+
+  // emit(key: string) {
+  //   this.events[key].forEach((event) => {
+  //     event.call(this, this);
+  //   });
+  // }
 
   todoNotification() {
     if (import.meta.env.DEV) {
@@ -38,6 +52,8 @@ export default class TodoManager {
       const timeset = setTimeout(
         () => {
           todo.finish();
+          this.update(todo.id, todo);
+          this.saveAll();
           pushMessage(todo.title, todo.content, todo.id);
           const index = todoQueue.findIndex((t) => t.id === todo.id);
           todoQueue.splice(index, 1);
@@ -45,7 +61,6 @@ export default class TodoManager {
             (n) => n === (timeset as unknown as number)
           );
           todoTimeoutQueue.splice(nIndex, 1);
-          this.saveAll();
           clearTimeout(timeset);
         },
         noticeTime < 0 ? 100 : noticeTime
@@ -144,6 +159,7 @@ export default class TodoManager {
   update(id: string, values: Todo) {
     const todo = this.findOne(id);
     todo.update(values);
+    this.addNotification(todo);
     this.saveAll();
     this.todoList = this.load();
   }

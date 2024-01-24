@@ -43,6 +43,9 @@ export default class Timestamp extends Date {
     ms && this.addMilliSecond(ms);
   }
 
+  removeSecond() {
+    this.setSeconds(0);
+  }
   removeMs() {
     this.setMilliseconds(0);
   }

@@ -1,3 +1,9 @@
+function isMobile() {
+  //@ts-ignore
+  const mobile = self.navigator.userAgentData.mobile;
+  return mobile;
+}
+
 self.addEventListener("push", function (event) {
   if ((event as any).data) {
     const data = (event as any).data?.json() ?? {};
@@ -27,6 +33,17 @@ self.addEventListener("message", function (event) {
     // console.log("서비스 워커가 메시지를 받았습니다: ", {
     //   ...data,
     // });
+
+    (self as any).clients.matchAll().then((clients) => {
+      clients.forEach((client) => {
+        client.postMessage({
+          type: "worker",
+          action: "todo/rerender",
+          data: {},
+        });
+      });
+    });
+
     (event as any).waitUntil(
       (self as any).registration
         .showNotification(title, {
@@ -36,11 +53,12 @@ self.addEventListener("message", function (event) {
         })
         .then(() => {
           (self as any).registration.getNotifications().then((values) => {
-            setTimeout(() => {
-              const notification = values[values.length - 1];
-              // console.log("close", notification);
-              notification.close();
-            }, 4000);
+            if (!isMobile()) {
+              setTimeout(() => {
+                const notification = values[values.length - 1];
+                notification.close();
+              }, 4000);
+            }
           });
         })
     );

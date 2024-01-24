@@ -12,19 +12,22 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { docuManager } from "../model/documentation.manager";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
 import Todo from "../model/todo";
+import { DataContext } from "../context/DataProvider";
 
 function TodoViewer() {
   const theme = useTheme();
+  const data = useContext(DataContext);
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
   const navigate = useNavigate();
   const params = Object.fromEntries(useSearchParams()[0].entries());
   const [todos, setTodos] = useState<Todo>(null);
+
   useEffect(() => {
     const todos = docuManager.todoManager.findOne(params.id);
     if (todos) {
@@ -32,7 +35,7 @@ function TodoViewer() {
     } else {
       navigate(BASE);
     }
-  }, [params.id, docuManager.documentation.version]);
+  }, [params.id, docuManager, data, setTodos]);
 
   function handleUpdateForm(id: string) {
     navigate(`${BASE}todos/update?id=${id}`);

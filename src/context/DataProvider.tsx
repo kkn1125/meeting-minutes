@@ -22,10 +22,11 @@ export enum DATA_ACTION {
 const reducer = (state, action) => {
   switch (action.type) {
     case DATA_ACTION.LOAD:
+      import.meta.env.DEV && console.log("load update");
       return {
         data: {
-          minutes: docuManager.findAll(),
-          todos: docuManager.todoManager.findAll(),
+          minutes: [...docuManager.findAll()],
+          todos: [...docuManager.todoManager.findAll()],
         },
         version: state.version + 1,
       };

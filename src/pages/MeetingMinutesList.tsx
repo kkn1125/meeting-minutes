@@ -15,10 +15,7 @@ import {
 import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { DataContext } from "../context/DataProvider";
-import {
-  DocumentationManager,
-  docuManager,
-} from "../model/documentation.manager";
+import { docuManager } from "../model/documentation.manager";
 import Minutes from "../model/minutes";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
@@ -38,7 +35,7 @@ function MeetingMinutesList() {
     setMinutesList(() =>
       docuList.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
     );
-  }, [data.data, data.version]);
+  }, [data, setMinutesList]);
 
   const minutesMemoList = useMemo(() => {
     const page = Number(params.page ?? 1);

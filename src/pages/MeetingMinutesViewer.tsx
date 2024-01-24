@@ -32,7 +32,7 @@ function MeetingMinutesViewer() {
     } else {
       navigate(BASE);
     }
-  }, [params.id, docuManager.documentation.version]);
+  }, [params.id, docuManager]);
 
   function handleUpdateForm(id: string) {
     navigate(`${BASE}meeting-minutes/update?id=${id}`);

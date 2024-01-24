@@ -55,6 +55,7 @@ export class DocumentationManager {
   }
   saveAll() {
     this.documentation.saveAll();
+    this.todoManager.saveAll();
   }
   jsonToUrl() {
     const jsonUrl = encodeURIComponent(

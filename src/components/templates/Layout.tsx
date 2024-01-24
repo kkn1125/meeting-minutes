@@ -112,15 +112,23 @@ function Layout() {
     // console.log((e as any).data);
     const { type, action, data } = (e as any).data;
     const { title, body, icon, tag } = data;
+    import.meta.env.DEV && console.log(action);
     if (type === "worker") {
       if (action === "todo/view") {
+        dataDispatch({
+          type: DATA_ACTION.LOAD,
+        });
         navigate(`${BASE}todos/view?id=${tag}`);
+      } else if (action === "todo/rerender") {
+        // import.meta.env.DEV && console.log("여기");
+        docuManager.saveAll();
+        docuManager.todoManager.todoList = docuManager.todoManager.load();
+
+        dataDispatch({
+          type: DATA_ACTION.LOAD,
+        });
       }
     }
-
-    dataDispatch({
-      type: DATA_ACTION.LOAD,
-    });
   }
 
   function handleDrop(e: DragEvent) {
