@@ -150,6 +150,7 @@ export default class TodoManager {
   }
 
   add(todo: Todo): void {
+    pushMessage("[등록] " + todo.title, todo.content, todo.id);
     if ("id" in todo) {
       this.updateSequenceBy();
       this.todoList.push(todo);
@@ -159,7 +160,6 @@ export default class TodoManager {
       this.todoList.push(todo);
       this.addNotification(todo);
     }
-    pushMessage("[등록] " + todo.title, todo.content, todo.id);
     this.saveAll();
     this.todoList = this.load();
   }
