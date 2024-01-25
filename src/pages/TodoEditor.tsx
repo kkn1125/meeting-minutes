@@ -106,6 +106,13 @@ function TodoEditor() {
     navigate(-1);
   }
 
+  function handleChangeTimeToNow(type: "startTime" | "endTime"): void {
+    const now = new Timestamp();
+    now.removeSecond();
+    now.removeMs();
+    formik.setFieldValue(type, now);
+  }
+
   return (
     <Box
       sx={{
@@ -153,8 +160,22 @@ function TodoEditor() {
                 },
               }}
             />
-            <DateField name='startTime' formik={formik} label='시작 시작' />
-            <DateField name='endTime' formik={formik} label='종료 시작' />
+            <Stack direction='row' alignItems='stretch' gap={1}>
+              <DateField name='startTime' formik={formik} label='시작 시작' />
+              <Button
+                variant='contained'
+                onClick={() => handleChangeTimeToNow("startTime")}>
+                now
+              </Button>
+            </Stack>
+            <Stack direction='row' alignItems='stretch' gap={1}>
+              <DateField name='endTime' formik={formik} label='종료 시작' />
+              <Button
+                variant='contained'
+                onClick={() => handleChangeTimeToNow("endTime")}>
+                now
+              </Button>
+            </Stack>
           </Stack>
           <Stack direction='row' gap={1}>
             <Button
