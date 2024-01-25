@@ -19,10 +19,12 @@ function Download() {
       const file = new File([blob], "backup.json", {
         type: blob.type,
       });
-      a.href = URL.createObjectURL(file);
+      const href = URL.createObjectURL(file);
+      a.href = href;
       a.download = "backup.json";
       a.click();
       a.remove();
+      URL.revokeObjectURL(href);
       handleHome();
     } else {
       alert("잘못된 접근입니다.");

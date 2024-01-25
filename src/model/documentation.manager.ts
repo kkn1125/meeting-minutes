@@ -120,6 +120,7 @@ export class DocumentationManager {
     a.href = url;
     a.click();
     a.remove();
+    URL.revokeObjectURL(url);
   }
   clearAllDocuments() {
     this.documentation.clearAllDocuments();

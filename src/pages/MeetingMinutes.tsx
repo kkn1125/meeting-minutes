@@ -355,32 +355,31 @@ function MeetingMinutes() {
         <Divider sx={{ my: 2 }} />
 
         {/* content & note */}
-        <Stack
-          direction={{
-            lg: "row",
-            xs: "column",
-          }}
-          gap={2}>
-          <ContentListField name='contents' formik={formik} />
-          <TextField
-            placeholder='떠오르는 아이디어를 작성하세요!'
-            label='메모'
-            name='note'
-            multiline
-            rows={10}
-            sx={{ flex: 0.35 }}
-            value={formik.values?.note}
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-            error={formik.touched.note && Boolean(formik.errors.note)}
-            helperText={formik.touched.note && formik.errors.note}
-            FormHelperTextProps={{
-              sx: {
-                position: "absolute",
-                top: "100%",
-              },
-            }}
-          />
+        <Stack gap={3}>
+          <Box sx={{ flex: 1 }}>
+            <ContentListField name='contents' formik={formik} />
+          </Box>
+          <Divider />
+          <Box sx={{ flex: 0.35 }}>
+            <TextField
+              placeholder='떠오르는 아이디어를 작성하세요!'
+              label='메모'
+              name='note'
+              multiline
+              fullWidth
+              value={formik.values?.note}
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
+              error={formik.touched.note && Boolean(formik.errors.note)}
+              helperText={formik.touched.note && formik.errors.note}
+              FormHelperTextProps={{
+                sx: {
+                  position: "absolute",
+                  top: "100%",
+                },
+              }}
+            />
+          </Box>
         </Stack>
 
         <Stack

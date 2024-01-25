@@ -217,7 +217,8 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
     const text = e.clipboardData.getData("text/plain");
     if (file) {
       const image = new Image();
-      image.src = URL.createObjectURL(file);
+      const url = URL.createObjectURL(file);
+      image.src = url;
       image.style.position = "fixed";
       image.style.top = "999999999999999999px";
       image.style.left = "999999999999999999px";
@@ -236,6 +237,7 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
           type: CONTENT_TYPE.IMAGE,
         });
         formik.setFieldValue("contents", formik.values.contents);
+        URL.revokeObjectURL(url);
       };
     } else if (text) {
       if (text.match(/[\n\r]/gm)) {
@@ -299,7 +301,7 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
   }
 
   return (
-    <Stack ref={focusRef} flex={1} gap={2} id='content-panel'>
+    <Stack ref={focusRef} gap={2} id='content-panel'>
       {formik.values?.contents.map(({ item }, index, o) => (
         <Fragment key={index}>
           <Stack

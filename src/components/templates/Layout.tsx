@@ -151,7 +151,7 @@ function Layout() {
   }
 
   function handleDragOver(e: DragEvent) {
-    if (e.dataTransfer.files.length > 0) {
+    if (e.dataTransfer.files.length > 0 || e.dataTransfer.items.length > 0) {
       e.preventDefault();
       e.stopPropagation();
       document.body.classList.add("dragover");

@@ -6,6 +6,7 @@ import {
   Divider,
   List,
   ListItemButton,
+  Paper,
   Skeleton,
   Stack,
   Typography,
@@ -18,6 +19,11 @@ import { docuManager } from "../model/documentation.manager";
 import Minutes, { CONTENT_TYPE } from "../model/minutes";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
+//@ts-ignore
+import { toPng } from "html-to-image";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import { jsPDF } from "jspdf";
+import ImageIcon from "@mui/icons-material/Image";
 
 function MeetingMinutesViewer() {
   const theme = useTheme();
@@ -45,6 +51,79 @@ function MeetingMinutesViewer() {
     navigate(`${BASE}meeting-minutes`);
   }
 
+  function getAllStyles(element) {
+    // let styleData = "";
+
+    function processElement(elem) {
+      const computedStyle = window.getComputedStyle(elem);
+
+      // 스타일 문자열로 변환
+      let elementStyle = "";
+      for (const style of computedStyle) {
+        elementStyle += `${style}: ${computedStyle.getPropertyValue(style)};`;
+      }
+      // let className = "";
+      // if (typeof elem.className === "object") {
+      //   if (elem.className.baseVal === "") {
+      //     className = "";
+      //   } else {
+      //     className = elem.className.baseVal.split(" ").join(".");
+      //   }
+      // } else {
+      //   className = elem.className.split(" ").join(".");
+      // }
+      // if (className !== "") {
+      // 스타일 태그로 래핑
+      elem.style.cssText = elementStyle;
+      elem.removeAttribute("class");
+      // styleData += `<style type='text/css'>.${className} { ${elementStyle} }</style>`;
+      // }
+      // 자식 엘리먼트에 대해서도 재귀적으로 처리
+      Array.from(elem.children).forEach((child) => processElement(child));
+    }
+
+    processElement(element);
+    // return styleData;
+    return element;
+  }
+
+  function saveToPdf(id: string) {
+    const viewer = document.getElementById("minutes-viewer");
+    const parent = viewer.parentElement;
+    const { width: pWidth, height: pHeight } = parent.getBoundingClientRect();
+
+    toPng(parent).then((dataUrl) => {
+      const pdf = new jsPDF({ unit: "px" });
+      const width = pdf.internal.pageSize.getWidth();
+      const height = pdf.internal.pageSize.getHeight();
+      const scale = 0.75;
+
+      const pRatio = pHeight / pWidth;
+
+      const applyWidth = width * scale;
+      const applyHeight = width * pRatio * scale;
+
+      const paddingX = (width - applyWidth) / 2;
+      const paddingY = Math.abs(height - applyHeight) / 2;
+      pdf.addImage(dataUrl, "PNG", paddingX, paddingY, applyWidth, applyHeight);
+      pdf.addImage(dataUrl, "PNG", paddingX, paddingY, applyWidth, applyHeight);
+      pdf.save("todo-" + id + ".pdf");
+    });
+  }
+
+  function saveToPng(id: string) {
+    const viewer = document.getElementById("minutes-viewer");
+    const parent = viewer.parentElement;
+
+    toPng(parent).then((dataUrl) => {
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = "todo-" + id + ".png";
+      a.click();
+      a.remove();
+    });
+  }
+
   if (minutes === null) {
     return (
       <Box
@@ -62,6 +141,7 @@ function MeetingMinutesViewer() {
 
   return (
     <Box
+      id='minutes-viewer'
       sx={{
         position: "relative",
         m: 5,
@@ -92,6 +172,26 @@ function MeetingMinutesViewer() {
           </Typography>
         </Stack>
         <Stack direction='row' gap={1}>
+          <Button
+            size={isMdUp ? "medium" : "small"}
+            variant='contained'
+            onClick={() => saveToPdf(params.id)}
+            sx={{
+              borderRadius: 100,
+            }}
+            startIcon={<PictureAsPdfIcon />}>
+            PDF
+          </Button>
+          <Button
+            size={isMdUp ? "medium" : "small"}
+            variant='contained'
+            onClick={() => saveToPng(params.id)}
+            sx={{
+              borderRadius: 100,
+            }}
+            startIcon={<ImageIcon />}>
+            PNG
+          </Button>
           <Button
             size={isMdUp ? "medium" : "small"}
             variant='contained'
@@ -239,14 +339,14 @@ function MeetingMinutesViewer() {
           </Stack>
         </Stack>
 
-        <Divider sx={{ my: 2 }} />
+        <Box
+          sx={{
+            borderTop: (theme) => `1px solid ${theme.palette.text.disabled}`,
+          }}
+        />
 
         {/* content & note */}
-        <Stack
-          component={List}
-          direction={{ xs: "column", md: "row" }}
-          justifyContent={"space-between"}
-          gap={3}>
+        <Stack component={List} justifyContent={"space-between"} gap={3}>
           <Stack flex={1} gap={1}>
             {minutes.contents.map(({ item, type }, index, o) => (
               <Fragment key={item + index}>
@@ -316,12 +416,42 @@ function MeetingMinutesViewer() {
                     </Typography>
                   )}
                 </ListItemButton>
-                {index < o.length - 1 && <Divider />}
+                {index < o.length - 1 && (
+                  <Box
+                    sx={{
+                      borderTop: (theme) =>
+                        `1px solid ${theme.palette.text.disabled}`,
+                    }}
+                  />
+                )}
               </Fragment>
             ))}
           </Stack>
-          <Typography variant='body2' sx={{ flex: 0.3 }}>
-            {minutes.note || "No Memo"}
+          <Typography
+            component={Paper}
+            elevation={3}
+            variant='body2'
+            sx={{
+              position: "relative",
+              flex: 0.3,
+              p: 2,
+              whiteSpace: "pre-wrap",
+              wordBreak: "keep-all",
+              "&::before": {
+                fontWeight: 700,
+                fontSize: (theme) => theme.typography.pxToRem(12),
+                textTransform: "uppercase",
+                textDecorationLine: "underline",
+                textDecorationThickness: 2,
+                textUnderlineOffset: 3,
+                content: '"note"',
+                position: "absolute",
+                top: 0,
+                transform: "translateY(-50%)",
+                left: 10,
+              },
+            }}>
+            {minutes.note || "empty :)"}
           </Typography>
         </Stack>
       </Stack>
