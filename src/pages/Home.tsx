@@ -7,14 +7,15 @@ function Home() {
     <Stack
       alignItems={{
         xs: "center",
-        md: "flex-start",
+        lg: "flex-start",
       }}>
       <Box
         sx={{
+          flex: 1,
           p: 5,
           textAlign: {
             xs: "center",
-            md: "inherit",
+            lg: "inherit",
           },
         }}>
         <Typography variant='h3'>Meeting Minutes</Typography>
@@ -22,7 +23,9 @@ function Home() {
       <Stack
         direction={{ xs: "column", lg: "row" }}
         gap={2}
+        flex={1}
         sx={{
+          width: "100%",
           p: 5,
         }}>
         <Button
