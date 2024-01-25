@@ -12,16 +12,17 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { Fragment, useContext, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { docuManager } from "../model/documentation.manager";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
 import Todo from "../model/todo";
 import { DataContext } from "../context/DataProvider";
+import { DocumentContext } from "../context/DocumentProdiver";
 
 function TodoViewer() {
   const theme = useTheme();
+  const docuManager = useContext(DocumentContext);
   const data = useContext(DataContext);
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
   const navigate = useNavigate();
@@ -47,6 +48,34 @@ function TodoViewer() {
     docuManager.todoManager.remove(id);
     navigate(`${BASE}todos`);
   }
+
+  const status: {
+    word: string;
+    color: "default" | "primary" | "success";
+  } = useMemo(() => {
+    if (!todos) {
+      return {
+        word: "",
+        color: "default",
+      };
+    }
+    if (todos.ended || todos.finished) {
+      return {
+        word: "완료",
+        color: "success",
+      };
+    } else if (todos.started) {
+      return {
+        word: "진행",
+        color: "primary",
+      };
+    } else if (!todos.started) {
+      return {
+        word: "대기",
+        color: "default",
+      };
+    }
+  }, [todos]);
 
   if (todos === null) {
     return (
@@ -174,10 +203,7 @@ function TodoViewer() {
             </Typography>
           </Stack>
           <Stack direction='row' gap={1}>
-            <Chip
-              label={todos.finished ? "종료" : "알림 예정"}
-              color={todos.finished ? "default" : "success"}
-            />
+            <Chip label={status.word} color={status.color} />
           </Stack>
         </Stack>
       </Stack>

@@ -11,8 +11,24 @@ import Download from "./pages/Download.tsx";
 import Todos from "./pages/Todos.tsx";
 import TodoEditor from "./pages/TodoEditor.tsx";
 import TodoViewer from "./pages/TodoViewer.tsx";
+import { useContext, useEffect } from "react";
+import { DocumentContext } from "./context/DocumentProdiver.tsx";
+import {
+  MESSAGE_ACTION,
+  MessageDispatchContext,
+} from "./context/MessageProvider.tsx";
 
 function App() {
+  const docuManager = useContext(DocumentContext);
+  const messageDispatch = useContext(MessageDispatchContext);
+
+  useEffect(() => {
+    messageDispatch({
+      type: MESSAGE_ACTION.SET_DOCU,
+      docuManager,
+    });
+  }, []);
+
   return (
     <Box
       component='main'

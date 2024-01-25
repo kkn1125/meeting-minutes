@@ -1,9 +1,37 @@
-import { isMobile, pushMessage } from "../util/features";
-import { todoQueue, todoTimeoutQueue } from "../util/global";
+import { format } from "../util/features";
 import Timestamp from "./timestamp";
 import Todo from "./todo";
 
 export default class TodoManager {
+  findGroupByTime(startTime: Date, endTime: Date): Todo[][] {
+    const year = startTime.getFullYear();
+    const month = startTime.getMonth();
+    const date = startTime.getDate();
+    // const baseTime = format(startTime, "YYYY-MM-dd");
+    const temp = {};
+    for (let i = date; i < date + 7; i++) {
+      const timeIndex = format(new Date(year, month, i), "YYYY-MM-dd");
+      temp[timeIndex] = [];
+    }
+    const timeList = this.findByTime(startTime, endTime);
+    return Object.values(
+      timeList.reduce((acc, cur) => {
+        const timeIndex = cur.startTime.split("T")[0];
+        if (!acc[timeIndex]) acc[timeIndex] = [];
+        if (acc[timeIndex]) acc[timeIndex].push(cur);
+        return acc;
+      }, temp)
+    );
+  }
+
+  findByTime(startTime: Date, endTime: Date) {
+    const sTime = format(startTime, "YYYY-MM-ddTHH:mm:ss.SSS");
+    const eTime = format(endTime, "YYYY-MM-ddTHH:mm:ss.SSS");
+    return this.todoList.filter(
+      (todo) => sTime <= todo.startTime && todo.endTime <= eTime
+    );
+  }
+
   private readonly TODO_STORAGE: string = "meeting-minutes/todolist";
 
   todoList: Todo[] = [];
@@ -26,72 +54,84 @@ export default class TodoManager {
   //   });
   // }
 
-  todoNotification() {
-    if (import.meta.env.DEV) {
-      console.log("inner todo manager setup notification");
-    }
-    while (todoTimeoutQueue.length > 0) {
-      const timeset = todoTimeoutQueue.shift();
-      clearTimeout(timeset);
-    }
-    todoQueue.splice(0);
-    const todos = this.findAll();
-    for (const todo of todos) {
-      if (todo.finished) continue;
-      this.addNotification(todo);
-    }
+  getNotifications() {
+    return this.todoList.filter((todo) => {
+      const now = new Timestamp();
+      const startTime = new Timestamp(todo.startTime);
+      const endTime = new Timestamp(todo.endTime);
+      const isStartableTime =
+        now.isAfterThan(startTime) || now.isSameAs(startTime);
+      const isEndableTime = now.isAfterThan(endTime) || now.isSameAs(endTime);
+      return todo.finished === false && (isStartableTime || isEndableTime);
+    });
   }
 
-  addNotification(todo: Todo) {
-    const now = new Timestamp();
-    const startTime = new Timestamp(todo.startTime);
-    const endTime = new Timestamp(todo.endTime);
-    startTime.removeSecond();
-    startTime.removeMs();
-    endTime.removeSecond();
-    endTime.removeMs();
-    if (startTime.isBeforeThan(now)) {
-      todoQueue.push(todo);
-      const noticeTime = now.getTime() - startTime.getTime();
-      const timeset = setTimeout(
-        () => {
-          this.update(todo.id, todo);
-          this.saveAll();
-          pushMessage("[시작] " + todo.title, todo.content, todo.id);
-          const index = todoQueue.findIndex((t) => t.id === todo.id);
-          todoQueue.splice(index, 1);
-          const nIndex = todoTimeoutQueue.findIndex(
-            (n) => n === (timeset as unknown as number)
-          );
-          todoTimeoutQueue.splice(nIndex, 1);
-          clearTimeout(timeset);
-        },
-        noticeTime < 0 ? 100 : noticeTime
-      );
-      todoTimeoutQueue.push(timeset as unknown as number);
-    }
-    if (now.isBeforeThan(endTime) || todo.finished === false) {
-      todoQueue.push(todo);
-      const noticeTime = endTime.getTime() - now.getTime();
-      const timeset = setTimeout(
-        () => {
-          todo.finish();
-          this.update(todo.id, todo);
-          this.saveAll();
-          pushMessage("[종료] " + todo.title, todo.content, todo.id);
-          const index = todoQueue.findIndex((t) => t.id === todo.id);
-          todoQueue.splice(index, 1);
-          const nIndex = todoTimeoutQueue.findIndex(
-            (n) => n === (timeset as unknown as number)
-          );
-          todoTimeoutQueue.splice(nIndex, 1);
-          clearTimeout(timeset);
-        },
-        noticeTime < 0 ? 100 : noticeTime
-      );
-      todoTimeoutQueue.push(timeset as unknown as number);
-    }
-  }
+  // todoNotification() {
+  //   if (import.meta.env.DEV) {
+  //     console.log("inner todo manager setup notification");
+  //   }
+  //   while (todoTimeoutQueue.length > 0) {
+  //     const timeset = todoTimeoutQueue.shift();
+  //     clearTimeout(timeset);
+  //   }
+  //   todoQueue.splice(0);
+  //   const todos = this.findAll();
+  //   for (const todo of todos) {
+  //     if (todo.finished) continue;
+  //     this.addNotification(todo);
+  //   }
+  // }
+
+  // addNotification(todo: Todo) {
+  //   const now = new Timestamp();
+  //   const startTime = new Timestamp(todo.startTime);
+  //   const endTime = new Timestamp(todo.endTime);
+  //   startTime.removeSecond();
+  //   startTime.removeMs();
+  //   endTime.removeSecond();
+  //   endTime.removeMs();
+  //   if (startTime.isBeforeThan(now)) {
+  //     todoQueue.push(todo);
+  //     const noticeTime = now.getTime() - startTime.getTime();
+  //     const timeset = setTimeout(
+  //       () => {
+  //         this.update(todo.id, todo);
+  //         this.saveAll();
+  //         pushMessage("[시작] " + todo.title, todo.content, todo.id);
+  //         const index = todoQueue.findIndex((t) => t.id === todo.id);
+  //         todoQueue.splice(index, 1);
+  //         const nIndex = todoTimeoutQueue.findIndex(
+  //           (n) => n === (timeset as unknown as number)
+  //         );
+  //         todoTimeoutQueue.splice(nIndex, 1);
+  //         clearTimeout(timeset);
+  //       },
+  //       noticeTime < 0 ? 100 : noticeTime
+  //     );
+  //     todoTimeoutQueue.push(timeset as unknown as number);
+  //   }
+  //   if (now.isBeforeThan(endTime) || todo.finished === false) {
+  //     todoQueue.push(todo);
+  //     const noticeTime = endTime.getTime() - now.getTime();
+  //     const timeset = setTimeout(
+  //       () => {
+  //         todo.finish();
+  //         this.update(todo.id, todo);
+  //         this.saveAll();
+  //         pushMessage("[종료] " + todo.title, todo.content, todo.id);
+  //         const index = todoQueue.findIndex((t) => t.id === todo.id);
+  //         todoQueue.splice(index, 1);
+  //         const nIndex = todoTimeoutQueue.findIndex(
+  //           (n) => n === (timeset as unknown as number)
+  //         );
+  //         todoTimeoutQueue.splice(nIndex, 1);
+  //         clearTimeout(timeset);
+  //       },
+  //       noticeTime < 0 ? 100 : noticeTime
+  //     );
+  //     todoTimeoutQueue.push(timeset as unknown as number);
+  //   }
+  // }
 
   /* storage management */
   initialize() {
@@ -100,7 +140,7 @@ export default class TodoManager {
     }
     this.todoList = this.load();
     this.saveAll();
-    this.todoNotification();
+    // this.todoNotification();
   }
 
   has(key: string) {
@@ -150,15 +190,14 @@ export default class TodoManager {
   }
 
   add(todo: Todo): void {
-    pushMessage("[등록] " + todo.title, todo.content, todo.id);
     if ("id" in todo) {
       this.updateSequenceBy();
       this.todoList.push(todo);
-      this.addNotification(todo);
+      // this.addNotification(todo);
     } else {
       this.updateSequenceBy();
       this.todoList.push(todo);
-      this.addNotification(todo);
+      // this.addNotification(todo);
     }
     this.saveAll();
     this.todoList = this.load();
@@ -184,8 +223,6 @@ export default class TodoManager {
   update(id: string, values: Todo) {
     const todo = this.findOne(id);
     todo.update(values);
-    pushMessage("[수정] " + todo.title, todo.content, todo.id);
-    this.addNotification(todo);
     this.saveAll();
     this.todoList = this.load();
   }

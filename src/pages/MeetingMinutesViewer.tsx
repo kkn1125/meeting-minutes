@@ -13,9 +13,8 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { docuManager } from "../model/documentation.manager";
 import Minutes, { CONTENT_TYPE } from "../model/minutes";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
@@ -24,11 +23,13 @@ import { toPng } from "html-to-image";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import { jsPDF } from "jspdf";
 import ImageIcon from "@mui/icons-material/Image";
+import { DocumentContext } from "../context/DocumentProdiver";
 
 function MeetingMinutesViewer() {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
   const navigate = useNavigate();
+  const docuManager = useContext(DocumentContext);
   const params = Object.fromEntries(useSearchParams()[0].entries());
   const [minutes, setMinutes] = useState<Minutes>(null);
   useEffect(() => {

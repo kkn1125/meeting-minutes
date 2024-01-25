@@ -8,6 +8,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import DarkModeProvider from "./context/DarkModeProvider.tsx";
 import DataProvider from "./context/DataProvider.tsx";
 import { BASE } from "./util/global.ts";
+import MessageProvider from "./context/MessageProvider.tsx";
 
 const registerServiceWorker = async () => {
   if ("serviceWorker" in navigator) {
@@ -65,13 +66,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     {/* <React.StrictMode></React.StrictMode> */}
     <CssBaseline />
     <DataProvider>
-      <BrowserRouter>
-        {/* <NextUIProvider> */}
-        <DarkModeProvider>
-          <App />
-        </DarkModeProvider>
-        {/* </NextUIProvider> */}
-      </BrowserRouter>
+      <MessageProvider>
+        <BrowserRouter>
+          {/* <NextUIProvider> */}
+          <DarkModeProvider>
+            <App />
+          </DarkModeProvider>
+          {/* </NextUIProvider> */}
+        </BrowserRouter>
+      </MessageProvider>
     </DataProvider>
   </>
 );

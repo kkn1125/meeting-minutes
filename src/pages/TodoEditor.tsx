@@ -1,21 +1,14 @@
 import { Box, Button, Stack, TextField } from "@mui/material";
-import React, { MouseEvent, useEffect } from "react";
 import { useFormik } from "formik";
-import * as yup from "yup";
+import { MouseEvent, useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { BASE } from "../util/global";
-import { format } from "../util/features";
-import Todo, { TodoInitialValues, TodoType } from "../model/todo";
+import * as yup from "yup";
 import DateField from "../components/atoms/DateField";
-import { docuManager } from "../model/documentation.manager";
+import { DocumentContext } from "../context/DocumentProdiver";
 import Timestamp from "../model/timestamp";
-
-const initialValues: TodoInitialValues = {
-  title: "",
-  content: "",
-  startTime: format(new Date(), "YYYY-MM-ddTHH:mm:ss.SSS"),
-  endTime: format(new Date(), "YYYY-MM-ddTHH:mm:ss.SSS"),
-};
+import Todo, { TodoInitialValues, TodoType } from "../model/todo";
+import { format } from "../util/features";
+import { BASE } from "../util/global";
 
 const validationSchema = yup.object({
   title: yup
@@ -34,6 +27,13 @@ const validationSchema = yup.object({
 });
 
 function TodoEditor() {
+  const initialValues: TodoInitialValues = {
+    title: "",
+    content: "",
+    startTime: format(new Date(), "YYYY-MM-ddTHH:mm:ss.SSS"),
+    endTime: format(new Date(), "YYYY-MM-ddTHH:mm:ss.SSS"),
+  };
+  const docuManager = useContext(DocumentContext);
   const locate = useLocation();
   const params = Object.fromEntries(
     new URLSearchParams(locate.search).entries()
@@ -59,9 +59,19 @@ function TodoEditor() {
         todo.startTime = startTime.toString();
         todo.endTime = endTime.toString();
         const now = new Timestamp();
-        if (now.isAfterThan(endTime)) {
-          todo.unfinish();
+        if (now.isBeforeThan(startTime)) {
+          todo.unnotifyStart();
+        } else if (now.isAfterThan(startTime)) {
+          todo.notifyStart();
         }
+        if (now.isBeforeThan(endTime)) {
+          todo.unnotifyEnd();
+          todo.unfinish();
+        } else if (now.isAfterThan(endTime)) {
+          todo.notifyEnd();
+          todo.finish();
+        }
+        todo.notification(1);
         docuManager.todoManager.update(params.id, todo);
         navigate(`${BASE}todos/view?id=${params.id}`);
       } else {
@@ -74,6 +84,7 @@ function TodoEditor() {
         endTime.removeMs();
         todo.startTime = startTime.toString();
         todo.endTime = endTime.toString();
+        todo.notification(0);
         docuManager.todoManager.add(todo);
         navigate(`${BASE}todos`);
       }

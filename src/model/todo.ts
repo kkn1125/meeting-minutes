@@ -1,5 +1,6 @@
 import { v4 } from "uuid";
 import Timestamp from "./timestamp";
+import { pushMessage } from "../util/features";
 
 export interface TodoType {
   id: string;
@@ -10,9 +11,22 @@ export interface TodoType {
   finished: boolean;
   keep: boolean;
   sequence: number;
+  started: boolean;
+  ended: boolean;
 }
 export interface TodoInitialValues
-  extends Omit<TodoType, "id" | "finished" | "keep" | "sequence"> {}
+  extends Omit<
+    TodoType,
+    "id" | "finished" | "keep" | "sequence" | "started" | "ended"
+  > {}
+
+export const NOTIFICATE_LEVEL: ["등록", "수정", "시작", "종료"] = [
+  "등록",
+  "수정",
+  "시작",
+  "종료",
+];
+type NotificationLevel = 0 | 1 | 2 | 3;
 
 export default class Todo {
   static time(): Timestamp;
@@ -85,11 +99,17 @@ export default class Todo {
   finished: boolean;
   keep: boolean;
   sequence: number;
+  started: boolean;
+  ended: boolean;
 
   constructor(todo: TodoType);
   constructor(todo: TodoInitialValues);
   constructor(todo: Partial<TodoInitialValues & TodoType>) {
     if ("id" in todo) {
+      const now = new Timestamp();
+      const startTime = new Timestamp(todo.startTime);
+      const endTime = new Timestamp(todo.endTime);
+
       this.id = todo.id ?? "todo-" + v4();
       this.title = todo.title;
       this.content = todo.content;
@@ -98,6 +118,8 @@ export default class Todo {
       this.finished = todo?.finished ?? false;
       this.keep = todo?.keep ?? false;
       this.sequence = todo?.sequence ?? 0;
+      this.started = todo?.started || startTime.isBeforeThan(now);
+      this.ended = todo?.ended || endTime.isBeforeThan(now);
     } else {
       this.id = "todo-" + v4();
       this.title = todo.title;
@@ -107,6 +129,8 @@ export default class Todo {
       this.finished = false;
       this.keep = false;
       this.sequence = 0;
+      this.started = false;
+      this.ended = false;
     }
   }
 
@@ -116,6 +140,8 @@ export default class Todo {
     this.startTime = values.startTime;
     this.endTime = values.endTime;
     this.finished = values.finished;
+    this.started = values.started;
+    this.ended = values.ended;
   }
 
   changeSequence(sequence: number) {
@@ -132,5 +158,53 @@ export default class Todo {
 
   unfinish() {
     this.finished = false;
+  }
+
+  notifyStart() {
+    this.started = true;
+  }
+
+  unnotifyStart() {
+    this.started = false;
+  }
+
+  notifyEnd() {
+    this.ended = true;
+  }
+
+  unnotifyEnd() {
+    this.ended = false;
+  }
+
+  isStartTime() {
+    const now = new Timestamp();
+    now.removeSecond();
+    now.removeMs();
+    const startTime = new Timestamp(this.startTime);
+    return startTime.isSameAs(now);
+  }
+
+  isEndTime() {
+    const now = new Timestamp();
+    now.removeSecond();
+    now.removeMs();
+    const endTime = new Timestamp(this.endTime);
+    return endTime.isSameAs(now);
+  }
+
+  isEndTimeOrPassed() {
+    const now = new Timestamp();
+    now.removeSecond();
+    now.removeMs();
+    const endTime = new Timestamp(this.endTime);
+    return endTime.isSameAs(now) || endTime.isBeforeThan(now);
+  }
+
+  notification(level: NotificationLevel) {
+    pushMessage(
+      `[${NOTIFICATE_LEVEL[level]}] ` + this.title,
+      this.content,
+      this.id
+    );
   }
 }

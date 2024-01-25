@@ -10,19 +10,27 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react";
+import {
+  ChangeEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { DataContext } from "../context/DataProvider";
-import { docuManager } from "../model/documentation.manager";
+import { DocumentContext } from "../context/DocumentProdiver";
+import Timestamp from "../model/timestamp";
 import Todo from "../model/todo";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
-import Timestamp from "../model/timestamp";
 
 const LIMIT = 5;
 
 function Todos() {
   const data = useContext(DataContext);
+  const docuManager = useContext(DocumentContext);
   const navigate = useNavigate();
   const locate = useLocation();
   const params = Object.fromEntries(
@@ -33,10 +41,6 @@ function Todos() {
   useEffect(() => {
     setTodosList(docuManager.todoManager.findAll());
   }, [data, setTodosList]);
-
-  function handleNavigatePage(e: ChangeEvent<unknown>, value: number) {
-    navigate(`?page=${value}`);
-  }
 
   const todosMemoList = useMemo(() => {
     const page = Number(params.page ?? 1);
@@ -58,6 +62,43 @@ function Todos() {
       })
       .slice((page - 1) * LIMIT, page * LIMIT);
   }, [todosList, params.page]);
+
+  const status = useCallback(
+    (
+      todo: Todo
+    ): {
+      word: string;
+      color: "default" | "primary" | "success";
+    } => {
+      if (!todo) {
+        return {
+          word: "",
+          color: "default",
+        };
+      }
+      if (todo.ended || todo.finished) {
+        return {
+          word: "완료",
+          color: "success",
+        };
+      } else if (todo.started) {
+        return {
+          word: "진행",
+          color: "primary",
+        };
+      } else if (!todo.started) {
+        return {
+          word: "대기",
+          color: "default",
+        };
+      }
+    },
+    [todosList]
+  );
+
+  function handleNavigatePage(e: ChangeEvent<unknown>, value: number) {
+    navigate(`?page=${value}`);
+  }
 
   function handleViewer(id: any): void {
     navigate(`${BASE}todos/view?id=${id}`);
@@ -103,8 +144,9 @@ function Todos() {
         {todosList.length === 0 && (
           <Typography>등록된 알림이 없습니다.</Typography>
         )}
-        {todosMemoList.map(
-          ({ id, title, content, startTime, endTime, finished }) => (
+        {todosMemoList.map((todo) => {
+          const { id, title, startTime, endTime } = todo;
+          return (
             <ListItemButton
               key={id}
               component={Stack}
@@ -149,15 +191,12 @@ function Todos() {
                     color={(theme) => theme.palette.text.disabled}>
                     {format(endTime, "YYYY-MM-dd HH:mm:ss")}
                   </Typography>
-                  <Chip
-                    label={finished ? "종료" : "알림 예정"}
-                    color={finished ? "default" : "success"}
-                  />
+                  <Chip label={status(todo).word} color={status(todo).color} />
                 </Stack>
               </Stack>
             </ListItemButton>
-          )
-        )}
+          );
+        })}
       </List>
       <Stack direction='row' justifyContent={"center"} sx={{ mt: 1, mb: 3 }}>
         <Pagination

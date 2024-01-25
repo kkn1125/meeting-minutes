@@ -10,17 +10,13 @@ import {
   createFilterOptions,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { MouseEvent, useEffect, useMemo, useRef } from "react";
+import { MouseEvent, useContext, useEffect, useMemo, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import ContentListField from "../components/atoms/ContentListField";
 import DateField from "../components/atoms/DateField";
 import TagField from "../components/atoms/TagField";
 import { Category } from "../model/documentation";
-import {
-  DocumentationManager,
-  docuManager,
-} from "../model/documentation.manager";
 import Minutes, {
   CONTENT_TYPE,
   InitialValues,
@@ -28,6 +24,7 @@ import Minutes, {
 } from "../model/minutes";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
+import { DocumentContext } from "../context/DocumentProdiver";
 
 const initialValues: InitialValues = {
   category: undefined,
@@ -78,6 +75,7 @@ function MeetingMinutes() {
   const params = Object.fromEntries(
     new URLSearchParams(locate.search).entries()
   );
+  const docuManager = useContext(DocumentContext);
   const categoryRef = useRef<HTMLInputElement>();
   const inputRef = useRef<HTMLInputElement>();
   const navigate = useNavigate();

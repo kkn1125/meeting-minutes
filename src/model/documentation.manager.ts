@@ -127,4 +127,5 @@ export class DocumentationManager {
     this.todoManager.clearAllTodos();
   }
 }
+
 export const docuManager = new DocumentationManager();

@@ -15,14 +15,15 @@ import {
 import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { DataContext } from "../context/DataProvider";
-import { docuManager } from "../model/documentation.manager";
 import Minutes from "../model/minutes";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
+import { DocumentContext } from "../context/DocumentProdiver";
 
 const LIMIT = 5;
 function MeetingMinutesList() {
   const data = useContext(DataContext);
+  const docuManager = useContext(DocumentContext);
   const navigate = useNavigate();
   const [minutesList, setMinutesList] = useState<Minutes[]>(null);
   const locate = useLocation();

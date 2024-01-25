@@ -13,11 +13,11 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { DATA_ACTION, DataDispatchContext } from "../../context/DataProvider";
-import { docuManager } from "../../model/documentation.manager";
 import { BASE } from "../../util/global";
 import DarkModeButton from "../atoms/DarkModeButton";
 import MenuItems from "../moleculars/MenuItems";
 import Footer from "../organisms/Footer";
+import { DocumentContext } from "../../context/DocumentProdiver";
 
 declare global {
   interface Window {
@@ -41,6 +41,7 @@ const crumbTo = {
 };
 
 function Layout() {
+  const docuManager = useContext(DocumentContext);
   const [isAgreeNotification, setIsAgreeNotification] = useState(false);
   const navigate = useNavigate();
   const dataDispatch = useContext(DataDispatchContext);
@@ -118,11 +119,22 @@ function Layout() {
         dataDispatch({
           type: DATA_ACTION.LOAD,
         });
+
         navigate(`${BASE}todos/view?id=${tag}`);
       } else if (action === "todo/rerender") {
         // import.meta.env.DEV && console.log("여기");
         docuManager.saveAll();
         docuManager.todoManager.todoList = docuManager.todoManager.load();
+
+        const todo = docuManager.todoManager.findOne(tag);
+        if (title.startsWith("[시작]")) {
+          todo.notifyStart();
+          docuManager.saveAll();
+        }
+        if (title.startsWith("[종료]")) {
+          todo.notifyEnd();
+          docuManager.saveAll();
+        }
 
         dataDispatch({
           type: DATA_ACTION.LOAD,

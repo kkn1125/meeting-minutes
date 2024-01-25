@@ -19,10 +19,11 @@ import {
   LinearScale,
   Tooltip,
 } from "chart.js";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Chart } from "react-chartjs-2";
-import { docuManager } from "../model/documentation.manager";
+import { DocumentContext } from "../context/DocumentProdiver";
 import Minutes from "../model/minutes";
+import Todo from "../model/todo";
 import { format } from "../util/features";
 
 ChartJS.register(
@@ -46,10 +47,12 @@ nextMonthTime.setMonth(nextMonthTime.getMonth() + 1);
 
 function WeeklyChart() {
   const theme = useTheme();
+  const docuManager = useContext(DocumentContext);
   const chartRef = useRef<ChartJS>(null);
   const [today, setToday] = useState(new Date(_year, _month, _date));
   const [weekDateList, setWeekDateList] = useState([]);
   const [documentations, setDocumentations] = useState<Minutes[][]>([]);
+  const [todos, setTodos] = useState<Todo[][]>([]);
   const [subDatas, setSubDatas] = useState([]);
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
 
@@ -78,8 +81,10 @@ function WeeklyChart() {
         backgroundColor: `#${randomColor().join("")}`,
       })
     );
+    const todoList = docuManager.todoManager.findGroupByTime(start, end);
     setSubDatas(subData);
     setDocumentations(docuList);
+    setTodos(todoList);
   }, [today]);
 
   function handleResizeChart() {
@@ -186,10 +191,28 @@ function WeeklyChart() {
             labels: weekDateList.map(dayForWeek),
             datasets: [
               {
-                label: "Amount",
+                label: "Documentation amount",
                 data: documentations.map((_) => _.length),
                 borderWidth: 1,
                 backgroundColor: "beige",
+              },
+              {
+                label: "Todo amount",
+                data: todos.map((_) => _.length),
+                borderWidth: 1,
+                backgroundColor: "green",
+              },
+              {
+                label: "Todo before amount",
+                data: todos.map((_) => _.filter(($) => !$.started).length),
+                borderWidth: 1,
+                backgroundColor: "grey",
+              },
+              {
+                label: "Todo after amount",
+                data: todos.map((_) => _.filter(($) => $.finished).length),
+                borderWidth: 1,
+                backgroundColor: "lightblue",
               },
               ...subDatas,
             ],

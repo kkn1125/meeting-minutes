@@ -39,7 +39,12 @@ self.addEventListener("message", function (event) {
         client.postMessage({
           type: "worker",
           action: "todo/rerender",
-          data: {},
+          data: {
+            title,
+            body,
+            icon,
+            tag: id,
+          },
         });
       });
     });
@@ -57,7 +62,7 @@ self.addEventListener("message", function (event) {
               setTimeout(() => {
                 const notification = values[values.length - 1];
                 notification.close();
-              }, 4000);
+              }, 5000);
             }
           });
         })
