@@ -124,6 +124,33 @@ function MeetingMinutesViewer() {
     });
   }
 
+  function copyToClipboardToPng(id: string) {
+    const viewer = document.getElementById("minutes-viewer");
+    const parent = viewer.parentElement;
+
+    toPng(parent).then((dataUrl) => {
+      const image = document.createElement("img");
+      image.src = dataUrl;
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      image.onload = () => {
+        canvas.width = image.width;
+        canvas.height = image.height;
+        ctx.drawImage(image, 0, 0);
+        canvas.toBlob((blob) => {
+          const clipboardItem = new ClipboardItem({
+            [blob.type]: blob,
+          });
+          navigator.clipboard.write([clipboardItem]).then((v) => {
+            alert(`"${id}" 문서를 클립보드에 PNG이미지로 복사했습니다.`);
+          });
+        });
+
+        image.remove();
+      };
+    });
+  }
+
   if (minutes === null) {
     return (
       <Box
@@ -191,6 +218,16 @@ function MeetingMinutesViewer() {
             }}
             startIcon={<ImageIcon />}>
             PNG
+          </Button>
+          <Button
+            size={isMdUp ? "medium" : "small"}
+            variant='contained'
+            onClick={() => copyToClipboardToPng(params.id)}
+            sx={{
+              borderRadius: 100,
+            }}
+            startIcon={<ImageIcon />}>
+            이미지로 복사
           </Button>
           <Button
             size={isMdUp ? "medium" : "small"}
