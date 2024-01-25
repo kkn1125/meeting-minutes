@@ -92,7 +92,7 @@ function Todos() {
               key={id}
               component={Stack}
               direction='row'
-              alignItems='flex-start'
+              alignItems='center'
               gap={1}
               onClick={() => handleViewer(id)}
               sx={{
@@ -106,6 +106,7 @@ function Todos() {
                 }}
                 gap={1}
                 justifyContent={"space-between"}
+                alignItems='center'
                 flex={1}>
                 <Stack
                   direction={{

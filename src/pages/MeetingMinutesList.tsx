@@ -95,9 +95,12 @@ function MeetingMinutesList() {
             key={id}
             component={Stack}
             direction='row'
-            alignItems='flex-start'
+            alignItems='center'
             gap={1}
-            onClick={() => handleViewer(id)}>
+            onClick={() => handleViewer(id)}
+            sx={{
+              flex: 0,
+            }}>
             <InsertDriveFileOutlinedIcon color='info' />
             <Stack
               direction={{
@@ -106,13 +109,15 @@ function MeetingMinutesList() {
               }}
               gap={1}
               justifyContent={"space-between"}
+              alignItems='center'
               flex={1}>
               <Stack
                 direction={{
                   xs: "column",
                   md: "row",
                 }}
-                gap={1}>
+                gap={1}
+                alignItems='center'>
                 <Tooltip title='분류'>
                   <Box>
                     <Chip label={category} size='small' />
