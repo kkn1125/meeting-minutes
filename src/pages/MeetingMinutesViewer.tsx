@@ -198,7 +198,7 @@ function MeetingMinutesViewer() {
             {minutes.category}
           </Typography>
         </Stack>
-        <Stack direction='row' gap={1}>
+        <Stack direction='row' gap={1} alignItems='center' flexWrap={"wrap"}>
           <Button
             size={isMdUp ? "medium" : "small"}
             variant='contained'
