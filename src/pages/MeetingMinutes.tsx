@@ -160,10 +160,7 @@ function MeetingMinutes() {
   }
 
   return (
-    <Box
-      sx={{
-        m: 5,
-      }}>
+    <Box>
       <Typography align='center' fontWeight={700} variant='h4'>
         <Autocomplete
           options={categoryOptions}

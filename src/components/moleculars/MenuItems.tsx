@@ -6,7 +6,13 @@ import InsertLinkIcon from "@mui/icons-material/InsertLink";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import MenuIcon from "@mui/icons-material/Menu";
 import SaveIcon from "@mui/icons-material/Save";
-import { IconButton, ListItemIcon, MenuList, Typography } from "@mui/material";
+import {
+  Divider,
+  IconButton,
+  ListItemIcon,
+  MenuList,
+  Typography,
+} from "@mui/material";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import Grow from "@mui/material/Grow";
 import MenuItem from "@mui/material/MenuItem";
@@ -24,6 +30,7 @@ import { useNavigate } from "react-router-dom";
 import { DATA_ACTION, DataDispatchContext } from "../../context/DataProvider";
 import { docuManager } from "../../model/documentation.manager";
 import { BASE, MODE } from "../../util/global";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 
 function MenuItems() {
   const [showFile, setShowFile] = useState(false);
@@ -145,6 +152,18 @@ function MenuItems() {
                   <MenuItem
                     onClick={(e) => {
                       handleClose(e);
+                      navigate(`${BASE}todos/add`);
+                    }}>
+                    <ListItemIcon>
+                      <PlaylistAddIcon fontSize='small' />
+                    </ListItemIcon>
+                    <Typography variant='body2' color='text.secondary'>
+                      할 일 작성
+                    </Typography>
+                  </MenuItem>
+                  <MenuItem
+                    onClick={(e) => {
+                      handleClose(e);
                       navigate(`${BASE}meeting-minutes/add`);
                     }}>
                     <ListItemIcon>
@@ -215,6 +234,7 @@ function MenuItems() {
                       링크로 내보내기
                     </Typography>
                   </MenuItem>
+                  <Divider flexItem />
                   <MenuItem
                     onClick={(e) => {
                       handleClose(e);

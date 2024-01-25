@@ -114,10 +114,7 @@ function TodoEditor() {
   }
 
   return (
-    <Box
-      sx={{
-        m: 5,
-      }}>
+    <Box>
       <Stack
         component={"form"}
         gap={4}

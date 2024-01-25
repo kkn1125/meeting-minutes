@@ -129,7 +129,7 @@ function MeetingMinutesViewer() {
     const parent = viewer.parentElement;
 
     toPng(parent).then((dataUrl) => {
-      const image = document.createElement("img");
+      const image = new Image();
       image.src = dataUrl;
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
@@ -138,14 +138,16 @@ function MeetingMinutesViewer() {
         canvas.height = image.height;
         ctx.drawImage(image, 0, 0);
         canvas.toBlob((blob) => {
+          const file = new File([blob], "todo-" + id + ".png", {
+            type: "image/png",
+          });
           const clipboardItem = new ClipboardItem({
-            [blob.type]: blob,
+            [file.type]: file,
           });
           navigator.clipboard.write([clipboardItem]).then((v) => {
             alert(`"${id}" 문서를 클립보드에 PNG이미지로 복사했습니다.`);
           });
         });
-
         image.remove();
       };
     });
@@ -156,7 +158,6 @@ function MeetingMinutesViewer() {
       <Box
         sx={{
           position: "relative",
-          m: 5,
         }}>
         <Stack>
           <Skeleton width='100%' height='2em' />
@@ -171,7 +172,6 @@ function MeetingMinutesViewer() {
       id='minutes-viewer'
       sx={{
         position: "relative",
-        m: 5,
       }}>
       <Stack
         direction={{ xs: "column-reverse", md: "row" }}

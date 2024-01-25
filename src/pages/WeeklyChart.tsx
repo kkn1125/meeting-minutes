@@ -153,7 +153,7 @@ function WeeklyChart() {
   }
 
   return (
-    <Stack gap={3} sx={{ m: 5 }}>
+    <Stack gap={3}>
       <Stack direction='row' alignItems={"center"} gap={1}>
         <Chip
           label={"Today"}

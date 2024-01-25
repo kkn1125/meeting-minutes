@@ -48,12 +48,7 @@ function Todos() {
 
   if (todosList === null) {
     return (
-      <List
-        component={Stack}
-        gap={1}
-        sx={{
-          m: 5,
-        }}>
+      <List component={Stack} gap={1}>
         <Stack direction='row' alignItems='center' gap={2}>
           <InsertDriveFileOutlinedIcon color='info' />
           <Skeleton width='100%' sx={{ fontSize: "2em" }} />
@@ -71,10 +66,7 @@ function Todos() {
   }
 
   return (
-    <Stack
-      sx={{
-        m: 5,
-      }}>
+    <Stack>
       <Stack direction='row'>
         <Button
           component={Link}

@@ -225,6 +225,7 @@ function Layout() {
           sx={{
             my: 5,
             mx: "auto",
+            p: 5,
             width: {
               lg: "60%",
               md: "80%",

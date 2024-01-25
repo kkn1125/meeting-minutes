@@ -53,7 +53,6 @@ function TodoViewer() {
       <Box
         sx={{
           position: "relative",
-          m: 5,
         }}>
         <Stack>
           <Skeleton width='100%' height='2em' />
@@ -67,7 +66,6 @@ function TodoViewer() {
     <Box
       sx={{
         position: "relative",
-        m: 5,
       }}>
       <Stack
         direction={{ xs: "column-reverse", md: "row" }}
