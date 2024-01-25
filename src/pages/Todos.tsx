@@ -17,6 +17,7 @@ import { docuManager } from "../model/documentation.manager";
 import Todo from "../model/todo";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
+import Timestamp from "../model/timestamp";
 
 const LIMIT = 5;
 
@@ -39,7 +40,23 @@ function Todos() {
 
   const todosMemoList = useMemo(() => {
     const page = Number(params.page ?? 1);
-    return (todosList || []).slice((page - 1) * LIMIT, page * LIMIT);
+    return (todosList || [])
+      .sort((a, b) => {
+        const bStart = new Timestamp(b.startTime);
+        const aStart = new Timestamp(a.startTime);
+        const bEnd = new Timestamp(b.endTime);
+        const aEnd = new Timestamp(a.endTime);
+        return bEnd.isAfterThan(aEnd)
+          ? 1
+          : bStart.isAfterThan(aStart)
+          ? 1
+          : b.finished
+          ? -1
+          : a.finished
+          ? -1
+          : -1;
+      })
+      .slice((page - 1) * LIMIT, page * LIMIT);
   }, [todosList, params.page]);
 
   function handleViewer(id: any): void {

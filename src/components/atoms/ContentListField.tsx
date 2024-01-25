@@ -116,6 +116,7 @@ function ContentListField({ name, formik }: ContentListFieldProps) {
     const target = e.target as HTMLDivElement;
     const draggableEl = target.closest("[draggable]") as HTMLDivElement;
     if (draggableEl) {
+      e.stopPropagation();
       const { height } = draggableEl.getBoundingClientRect();
       const index = Number(draggableEl.dataset.index);
       if (height / 2 > e.offsetY) {

@@ -44,8 +44,32 @@ export default class TodoManager {
 
   addNotification(todo: Todo) {
     const now = new Timestamp();
+    const startTime = new Timestamp(todo.startTime);
     const endTime = new Timestamp(todo.endTime);
+    startTime.removeSecond();
+    startTime.removeMs();
+    endTime.removeSecond();
     endTime.removeMs();
+    if (startTime.isBeforeThan(now)) {
+      todoQueue.push(todo);
+      const noticeTime = now.getTime() - startTime.getTime();
+      const timeset = setTimeout(
+        () => {
+          this.update(todo.id, todo);
+          this.saveAll();
+          pushMessage("[시작] " + todo.title, todo.content, todo.id);
+          const index = todoQueue.findIndex((t) => t.id === todo.id);
+          todoQueue.splice(index, 1);
+          const nIndex = todoTimeoutQueue.findIndex(
+            (n) => n === (timeset as unknown as number)
+          );
+          todoTimeoutQueue.splice(nIndex, 1);
+          clearTimeout(timeset);
+        },
+        noticeTime < 0 ? 100 : noticeTime
+      );
+      todoTimeoutQueue.push(timeset as unknown as number);
+    }
     if (now.isBeforeThan(endTime) || todo.finished === false) {
       todoQueue.push(todo);
       const noticeTime = endTime.getTime() - now.getTime();
@@ -54,7 +78,7 @@ export default class TodoManager {
           todo.finish();
           this.update(todo.id, todo);
           this.saveAll();
-          pushMessage(todo.title, todo.content, todo.id);
+          pushMessage("[종료] " + todo.title, todo.content, todo.id);
           const index = todoQueue.findIndex((t) => t.id === todo.id);
           todoQueue.splice(index, 1);
           const nIndex = todoTimeoutQueue.findIndex(
@@ -135,6 +159,7 @@ export default class TodoManager {
       this.todoList.push(todo);
       this.addNotification(todo);
     }
+    pushMessage("[등록] " + todo.title, todo.content, todo.id);
     this.saveAll();
     this.todoList = this.load();
   }
@@ -159,6 +184,7 @@ export default class TodoManager {
   update(id: string, values: Todo) {
     const todo = this.findOne(id);
     todo.update(values);
+    pushMessage("[수정] " + todo.title, todo.content, todo.id);
     this.addNotification(todo);
     this.saveAll();
     this.todoList = this.load();

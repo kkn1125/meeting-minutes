@@ -151,11 +151,22 @@ function Layout() {
   }
 
   function handleDragOver(e: DragEvent) {
-    if (e.dataTransfer.files.length > 0 || e.dataTransfer.items.length > 0) {
+    const target = e.target as HTMLElement;
+    const formEl = target.closest("form");
+
+    if (formEl) {
       e.preventDefault();
-      e.stopPropagation();
-      document.body.classList.add("dragover");
-      // console.log(e);
+    } else {
+      if (e.dataTransfer.files.length > 0 || e.dataTransfer.items.length > 0) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (
+          e.dataTransfer.files?.[0]?.type.match("json") ||
+          e.dataTransfer.items?.[0]?.type.match("json")
+        ) {
+          document.body.classList.add("dragover");
+        }
+      }
     }
   }
 

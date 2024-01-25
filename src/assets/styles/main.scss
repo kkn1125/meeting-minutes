@@ -30,6 +30,7 @@ body,
 
 body {
   &.dragover::before {
+    pointer-events: none;
     content: "";
     position: absolute;
     top: 0;
@@ -47,6 +48,7 @@ body {
     -o-border-radius: 1em;
   }
   &.dragover::after {
+    pointer-events: none;
     content: "bckup file drop 📝";
     color: #fff;
     font-size: 2em;

@@ -51,42 +51,6 @@ function MeetingMinutesViewer() {
     navigate(`${BASE}meeting-minutes`);
   }
 
-  function getAllStyles(element) {
-    // let styleData = "";
-
-    function processElement(elem) {
-      const computedStyle = window.getComputedStyle(elem);
-
-      // 스타일 문자열로 변환
-      let elementStyle = "";
-      for (const style of computedStyle) {
-        elementStyle += `${style}: ${computedStyle.getPropertyValue(style)};`;
-      }
-      // let className = "";
-      // if (typeof elem.className === "object") {
-      //   if (elem.className.baseVal === "") {
-      //     className = "";
-      //   } else {
-      //     className = elem.className.baseVal.split(" ").join(".");
-      //   }
-      // } else {
-      //   className = elem.className.split(" ").join(".");
-      // }
-      // if (className !== "") {
-      // 스타일 태그로 래핑
-      elem.style.cssText = elementStyle;
-      elem.removeAttribute("class");
-      // styleData += `<style type='text/css'>.${className} { ${elementStyle} }</style>`;
-      // }
-      // 자식 엘리먼트에 대해서도 재귀적으로 처리
-      Array.from(elem.children).forEach((child) => processElement(child));
-    }
-
-    processElement(element);
-    // return styleData;
-    return element;
-  }
-
   function saveToPdf(id: string) {
     const viewer = document.getElementById("minutes-viewer");
     const parent = viewer.parentElement;
