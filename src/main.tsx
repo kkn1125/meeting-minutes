@@ -20,7 +20,7 @@ const registerServiceWorker = async () => {
         }
       );
       registration.update().then(() => {
-        console.log("Service worker updated");
+        import.meta.env.DEV && console.log("Service worker updated");
         if (registration.installing) {
           console.log("Service worker installing");
         } else if (registration.waiting) {
