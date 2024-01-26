@@ -62,7 +62,9 @@ export default class TodoManager {
       const isStartableTime =
         now.isAfterThan(startTime) || now.isSameAs(startTime);
       const isEndableTime = now.isAfterThan(endTime) || now.isSameAs(endTime);
-      return todo.finished === false && (isStartableTime || isEndableTime);
+      const notFinishedAndPassed =
+        todo.finished === false && (isStartableTime || isEndableTime);
+      return notFinishedAndPassed;
     });
   }
 

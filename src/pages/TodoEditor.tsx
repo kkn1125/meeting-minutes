@@ -9,6 +9,7 @@ import Timestamp from "../model/timestamp";
 import Todo, { TodoInitialValues, TodoType } from "../model/todo";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
+import { MessageContext } from "../context/MessageProvider";
 
 const validationSchema = yup.object({
   title: yup
@@ -33,6 +34,7 @@ function TodoEditor() {
     startTime: format(new Date(), "YYYY-MM-ddTHH:mm:ss.SSS"),
     endTime: format(new Date(), "YYYY-MM-ddTHH:mm:ss.SSS"),
   };
+  const messageManager = useContext(MessageContext);
   const docuManager = useContext(DocumentContext);
   const locate = useLocation();
   const params = Object.fromEntries(
@@ -71,7 +73,8 @@ function TodoEditor() {
           todo.notifyEnd();
           todo.finish();
         }
-        todo.notification(1);
+
+        messageManager.notification(todo, 1);
         docuManager.todoManager.update(params.id, todo);
         navigate(`${BASE}todos/view?id=${params.id}`);
       } else {
@@ -84,7 +87,15 @@ function TodoEditor() {
         endTime.removeMs();
         todo.startTime = startTime.toString();
         todo.endTime = endTime.toString();
-        todo.notification(0);
+        messageManager.notification(todo, 0);
+
+        const now = new Timestamp();
+        if (startTime.isBeforeThan(now) || startTime.isSameAs(now)) {
+          messageManager.notification(todo, 2);
+        }
+        if (endTime.isBeforeThan(now) || endTime.isSameAs(now)) {
+          messageManager.notification(todo, 3);
+        }
         docuManager.todoManager.add(todo);
         navigate(`${BASE}todos`);
       }

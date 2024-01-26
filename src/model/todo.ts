@@ -20,14 +20,6 @@ export interface TodoInitialValues
     "id" | "finished" | "keep" | "sequence" | "started" | "ended"
   > {}
 
-export const NOTIFICATE_LEVEL: ["등록", "수정", "시작", "종료"] = [
-  "등록",
-  "수정",
-  "시작",
-  "종료",
-];
-type NotificationLevel = 0 | 1 | 2 | 3;
-
 export default class Todo {
   static time(): Timestamp;
   static time(year: number): Timestamp;
@@ -200,11 +192,7 @@ export default class Todo {
     return endTime.isSameAs(now) || endTime.isBeforeThan(now);
   }
 
-  notification(level: NotificationLevel) {
-    pushMessage(
-      `[${NOTIFICATE_LEVEL[level]}] ` + this.title,
-      this.content,
-      this.id
-    );
-  }
+  // notification(level: NotificationLevel) {
+
+  // }
 }

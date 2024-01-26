@@ -43,7 +43,7 @@ self.addEventListener("message", function (event) {
             title,
             body,
             icon,
-            tag: id,
+            id,
           },
         });
       });
@@ -54,7 +54,7 @@ self.addEventListener("message", function (event) {
         .showNotification(title, {
           body,
           icon,
-          tag: id,
+          data: { id },
         })
         .then(() => {
           (self as any).registration.getNotifications().then((values) => {
@@ -71,14 +71,14 @@ self.addEventListener("message", function (event) {
 });
 
 function sendToMain(notification: Notification) {
-  const { title, body, icon, tag } = notification;
-  if (tag) {
+  const { title, body, icon, data } = notification;
+  if (data.id) {
     (self as any).clients.matchAll().then((clients) => {
       clients.forEach((client) => {
         client.postMessage({
           type: "worker",
           action: "todo/view",
-          data: { title, body, icon, tag },
+          data: { title, body, icon, id: data.id },
         });
       });
     });

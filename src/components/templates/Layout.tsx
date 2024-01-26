@@ -112,21 +112,19 @@ function Layout() {
       return;
     // console.log((e as any).data);
     const { type, action, data } = (e as any).data;
-    const { title, body, icon, tag } = data;
+    const { title, body, icon, id } = data;
     import.meta.env.DEV && console.log(action);
     if (type === "worker") {
       if (action === "todo/view") {
         dataDispatch({
           type: DATA_ACTION.LOAD,
         });
-
-        navigate(`${BASE}todos/view?id=${tag}`);
+        navigate(`${BASE}todos/view?id=${id}`);
       } else if (action === "todo/rerender") {
-        // import.meta.env.DEV && console.log("여기");
         docuManager.saveAll();
         docuManager.todoManager.todoList = docuManager.todoManager.load();
 
-        const todo = docuManager.todoManager.findOne(tag);
+        const todo = docuManager.todoManager.findOne(id);
         if (title.startsWith("[시작]")) {
           todo.notifyStart();
           docuManager.saveAll();
