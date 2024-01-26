@@ -127,13 +127,7 @@ export default class Todo {
   }
 
   update(values: TodoInitialValues & TodoType) {
-    this.title = values.title;
-    this.content = values.content;
-    this.startTime = values.startTime;
-    this.endTime = values.endTime;
-    this.finished = values.finished;
-    this.started = values.started;
-    this.ended = values.ended;
+    Object.assign(this, values);
   }
 
   changeSequence(sequence: number) {

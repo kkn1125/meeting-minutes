@@ -19,16 +19,14 @@ const registerServiceWorker = async () => {
           scope: BASE,
         }
       );
-      registration.update().then(() => {
-        import.meta.env.DEV && console.log("Service worker updated");
-        if (registration.installing) {
-          console.log("Service worker installing");
-        } else if (registration.waiting) {
-          console.log("Service worker installed");
-        } else if (registration.active) {
-          console.log("Service worker active");
-        }
-      });
+      import.meta.env.DEV && console.log("Service worker updated");
+      if (registration.installing) {
+        console.log("Service worker installing");
+      } else if (registration.waiting) {
+        console.log("Service worker installed");
+      } else if (registration.active) {
+        console.log("Service worker active");
+      }
     } catch (error) {
       console.error(`Registration failed with ${error}`);
     }

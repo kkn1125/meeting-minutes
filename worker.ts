@@ -4,25 +4,25 @@ function isMobile() {
   return mobile;
 }
 
-self.addEventListener("push", function (event) {
-  if ((event as any).data) {
-    const data = (event as any).data?.json() ?? {};
-    // console.log(data);
-    const options = {
-      body: data.body,
-      icon: data.icon,
-      // 다른 알림 옵션을 추가할 수 있습니다.
-    };
+// self.addEventListener("push", function (event) {
+//   if ((event as any).data) {
+//     const data = (event as any).data?.json() ?? {};
+//     // console.log(data);
+//     const options = {
+//       body: data.body,
+//       icon: data.icon,
+//       // 다른 알림 옵션을 추가할 수 있습니다.
+//     };
 
-    (event as any).waitUntil(
-      (self as any).registration.showNotification(data.title, options)
-    );
-  }
-});
+//     (event as any).waitUntil(
+//       (self as any).registration.showNotification(data.title, options)
+//     );
+//   }
+// });
 
 self.addEventListener("notificationclick", function (e) {
-  (e as any).notification.close();
   sendToMain((e as any).notification);
+  (e as any).notification.close();
   // 알림 클릭 시 필요한 동작을 추가할 수 있습니다.
 });
 
@@ -55,6 +55,7 @@ self.addEventListener("message", function (event) {
           body,
           icon,
           data: { id },
+          tag: Date.now(),
         })
         .then(() => {
           (self as any).registration.getNotifications().then((values) => {

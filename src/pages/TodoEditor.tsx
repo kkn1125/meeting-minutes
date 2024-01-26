@@ -51,7 +51,8 @@ function TodoEditor() {
     },
     onSubmit: (values) => {
       if (params.id) {
-        const todo = new Todo(values as TodoType);
+        const todo = docuManager.todoManager.findOne(params.id);
+        todo.update(values as TodoType);
         const startTime = new Timestamp(todo.startTime);
         const endTime = new Timestamp(todo.endTime);
         startTime.removeSecond();
@@ -60,21 +61,25 @@ function TodoEditor() {
         endTime.removeMs();
         todo.startTime = startTime.toString();
         todo.endTime = endTime.toString();
+
+        messageManager.notification(todo, 1);
+
         const now = new Timestamp();
         if (now.isBeforeThan(startTime)) {
           todo.unnotifyStart();
         } else if (now.isAfterThan(startTime)) {
+          messageManager.notification(todo, 2);
           todo.notifyStart();
         }
         if (now.isBeforeThan(endTime)) {
           todo.unnotifyEnd();
           todo.unfinish();
         } else if (now.isAfterThan(endTime)) {
+          messageManager.notification(todo, 3);
           todo.notifyEnd();
           todo.finish();
         }
 
-        messageManager.notification(todo, 1);
         docuManager.todoManager.update(params.id, todo);
         navigate(`${BASE}todos/view?id=${params.id}`);
       } else {
@@ -87,6 +92,7 @@ function TodoEditor() {
         endTime.removeMs();
         todo.startTime = startTime.toString();
         todo.endTime = endTime.toString();
+
         messageManager.notification(todo, 0);
 
         const now = new Timestamp();

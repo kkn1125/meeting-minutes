@@ -40,6 +40,12 @@ export function sendNotificationToServiceWorker(
   id: string
 ) {
   if ("serviceWorker" in navigator && "PushManager" in window) {
+    if (navigator.serviceWorker.controller === null) {
+      alert("강제 새로고침 되었기 때문에 워커를 다시 로드합니다.");
+      location.reload();
+      return;
+    }
+    console.log("보내기", title, id);
     navigator.serviceWorker.controller.postMessage({
       type: "notify",
       data: {

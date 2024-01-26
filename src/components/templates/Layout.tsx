@@ -116,6 +116,7 @@ function Layout() {
     import.meta.env.DEV && console.log(action);
     if (type === "worker") {
       if (action === "todo/view") {
+        console.log(id);
         dataDispatch({
           type: DATA_ACTION.LOAD,
         });
@@ -123,7 +124,6 @@ function Layout() {
       } else if (action === "todo/rerender") {
         docuManager.saveAll();
         docuManager.todoManager.todoList = docuManager.todoManager.load();
-
         const todo = docuManager.todoManager.findOne(id);
         if (title.startsWith("[시작]")) {
           todo.notifyStart();
