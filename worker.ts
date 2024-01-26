@@ -58,14 +58,14 @@ self.addEventListener("message", function (event) {
           tag: Date.now(),
         })
         .then(() => {
-          (self as any).registration.getNotifications().then((values) => {
-            if (!isMobile()) {
-              setTimeout(() => {
-                const notification = values[values.length - 1];
-                notification.close();
-              }, 5000);
-            }
-          });
+          // (self as any).registration.getNotifications().then((values) => {
+          //   if (!isMobile()) {
+          //     setTimeout(() => {
+          //       const notification = values[values.length - 1];
+          //       notification.close();
+          //     }, 5000);
+          //   }
+          // });
         })
     );
   }
