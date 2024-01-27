@@ -10,6 +10,8 @@ import {
   Stack,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   ChangeEvent,
@@ -39,6 +41,8 @@ function Todos() {
   );
   const [todosList, setTodosList] = useState<Todo[]>(null);
   const [currentPage, setCurrentPage] = useState(Number(params.page) || 1);
+  const theme = useTheme();
+  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
 
   useEffect(() => {
     setTodosList(docuManager.todoManager.findAll());
@@ -184,8 +188,9 @@ function Todos() {
               onClick={() => handleViewer(id)}
               sx={{
                 flex: 0,
+                flexWrap: "wrap",
               }}>
-              <InsertDriveFileOutlinedIcon color='info' />
+              {isMdUp && <InsertDriveFileOutlinedIcon color='info' />}
               <Stack
                 direction={{
                   xs: "column",

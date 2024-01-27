@@ -17,6 +17,7 @@ describe("test tool", () => {
         content: "백엔드",
         startTime: now,
         endTime: time,
+        important: 0,
       })
     );
   });

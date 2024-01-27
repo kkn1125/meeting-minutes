@@ -3,21 +3,30 @@ import mermaid from "mermaid";
 import { useContext, useEffect, useState } from "react";
 import { DocumentContext } from "../context/DocumentProdiver";
 import Timestamp from "../model/timestamp";
+import { useNavigate } from "react-router-dom";
+import { BASE } from "../util/global";
 
 function QuadrantChart() {
+  const navigate = useNavigate();
   const docuManager = useContext(DocumentContext);
   const [content, setContent] = useState("");
   const [campaign, setCampaign] = useState([]);
 
   useEffect(() => {
     const todos = docuManager.todoManager.findAll();
+    const list = todos.map(
+      (todo) =>
+        new Timestamp(todo.endTime).getTime() -
+        new Timestamp(todo.startTime).getTime()
+    );
+    const maxTime = Math.max(...list);
+    const minTime = Math.min(...list);
     const quadrants = todos.map((todo) => {
       const startTime = new Timestamp(todo.startTime);
       const endTime = new Timestamp(todo.endTime);
       const gapTime = endTime.getTime() - startTime.getTime();
-      const base = 1000 * 60 * 5;
+      const base = maxTime - minTime;
       const result = parseFloat((gapTime / base).toFixed(1));
-
       return {
         campaign: todo.id.split("-")[1].slice(0, 10) + ":",
         xy: `[${result > 1 ? 1 : result}, ${(todo.important + 3) / 6}]`,
@@ -41,6 +50,11 @@ function QuadrantChart() {
     `
     );
     setCampaign(quadrants);
+
+    window.addEventListener("click", handleNavigate);
+    return () => {
+      window.removeEventListener("click", handleNavigate);
+    };
   }, []);
 
   useEffect(() => {
@@ -55,9 +69,36 @@ function QuadrantChart() {
         const type = mermaid.detectType(content);
         import.meta.env.DEV && console.log("type:", type);
         await mermaid.run();
+        const textList = [...document.querySelectorAll("text")];
+        textList.forEach((textEl) => {
+          if (!textEl.textContent.match(/^[ㄱ-힣]+/g)) {
+            const color = "#de35ab";
+            textEl.style.cssText = "cursor: pointer";
+            if (
+              textEl.previousElementSibling &&
+              textEl.previousElementSibling.tagName === "circle"
+            ) {
+              textEl.previousElementSibling.setAttribute("fill", color);
+            }
+            textEl.setAttribute("fill", color);
+          }
+        });
       }
     })();
   }, [content, campaign]);
+
+  function handleNavigate(e: MouseEvent) {
+    const todos = docuManager.todoManager.findAll();
+    const target = e.target as SVGTextElement;
+    if (target.tagName === "text" && !target.textContent.match(/^[ㄱ-힣]+/g)) {
+      const todo = todos.find((todo) =>
+        todo.id.slice(5).match(target.textContent)
+      );
+      if (todo) {
+        navigate(`${BASE}todos/view?id=${todo.id}`);
+      }
+    }
+  }
 
   const ContentBox = () => {
     return (

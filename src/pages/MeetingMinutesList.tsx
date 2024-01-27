@@ -12,6 +12,8 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -32,6 +34,8 @@ function MeetingMinutesList() {
     new URLSearchParams(locate.search).entries()
   );
   const [currentPage, setCurrentPage] = useState(Number(params.page) || 1);
+  const theme = useTheme();
+  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
 
   useEffect(() => {
     const docuList = docuManager.findAll();
@@ -102,7 +106,7 @@ function MeetingMinutesList() {
 
   return (
     <Stack>
-      <Stack direction='row'>
+      <Stack direction='row' justifyContent={"space-between"} gap={3}>
         <Button
           component={Link}
           to={BASE + "meeting-minutes/add"}
@@ -133,7 +137,7 @@ function MeetingMinutesList() {
             sx={{
               flex: 0,
             }}>
-            <InsertDriveFileOutlinedIcon color='info' />
+            {isMdUp && <InsertDriveFileOutlinedIcon color='info' />}
             <Stack
               direction={{
                 xs: "column",
@@ -141,7 +145,7 @@ function MeetingMinutesList() {
               }}
               gap={1}
               justifyContent={"space-between"}
-              alignItems='center'
+              alignItems={{ xs: "flex-start", md: "center" }}
               flex={1}>
               <Stack
                 direction={{
