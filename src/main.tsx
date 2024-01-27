@@ -10,8 +10,6 @@ import DataProvider from "./context/DataProvider.tsx";
 import { BASE } from "./util/global.ts";
 import MessageProvider from "./context/MessageProvider.tsx";
 
-// const test = "https://fcm.googleapis.com/fcm/send";
-
 const registerServiceWorker = async () => {
   if ("serviceWorker" in navigator) {
     try {

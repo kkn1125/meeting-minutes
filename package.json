@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "prod": "cross-env NODE_ENV=production vite",
-    "build": "rm -rf dist/ && tsc && cross-env NODE_ENV=production vite build",
-    "build:local": "rm -rf meeting-minutes/www/* && rm -rf dist2/ && tsc && cross-env NODE_ENV=local vite build",
+    "build": "rm -rf dist/ && tsc && cross-env NODE_ENV=production VITE_MODE=production vite build",
+    "build:local": "rm -rf meeting-minutes/www/* && rm -rf dist2/ && tsc && cross-env NODE_ENV=production VITE_MODE=local vite build",
     "create": "mkdir \"dist/todos\" \"dist/quadrant-chart\" \"dist/todos/view\" \"dist/todos/add\" \"dist/todos/update\" \"dist/meeting-minutes\" \"dist/meeting-minutes/view\" \"dist/meeting-minutes/add\" \"dist/meeting-minutes/update\" \"dist/chart\" \"dist/download\"",
     "create:local": "mkdir \"dist2/todos\" \"dist2/quadrant-chart\" \"dist2/todos/view\" \"dist2/todos/add\" \"dist2/todos/update\" \"dist2/meeting-minutes\" \"dist2/meeting-minutes/view\" \"dist2/meeting-minutes/add\" \"dist2/meeting-minutes/update\" \"dist2/chart\" \"dist2/download\"",
     "workerbuild": "tsc worker.ts && cp worker.js dist/ && rm worker.js",
