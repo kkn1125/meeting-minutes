@@ -1,6 +1,5 @@
 import { v4 } from "uuid";
 import Timestamp from "./timestamp";
-import { pushMessage } from "../util/features";
 
 export interface TodoType {
   id: string;
@@ -13,6 +12,7 @@ export interface TodoType {
   sequence: number;
   started: boolean;
   ended: boolean;
+  important: number;
 }
 export interface TodoInitialValues
   extends Omit<
@@ -93,6 +93,7 @@ export default class Todo {
   sequence: number;
   started: boolean;
   ended: boolean;
+  important: number;
 
   constructor(todo: TodoType);
   constructor(todo: TodoInitialValues);
@@ -112,6 +113,7 @@ export default class Todo {
       this.sequence = todo?.sequence ?? 0;
       this.started = todo?.started || startTime.isBeforeThan(now);
       this.ended = todo?.ended || endTime.isBeforeThan(now);
+      this.important = todo?.important || 0;
     } else {
       this.id = "todo-" + v4();
       this.title = todo.title;
@@ -123,6 +125,7 @@ export default class Todo {
       this.sequence = 0;
       this.started = false;
       this.ended = false;
+      this.important = todo.important;
     }
   }
 

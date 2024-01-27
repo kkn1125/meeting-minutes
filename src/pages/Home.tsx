@@ -49,6 +49,13 @@ function Home() {
           color='success'>
           Weekly Chart
         </Button>
+        <Button
+          component={Link}
+          to={BASE + "quadrant-chart"}
+          variant='contained'
+          color='success'>
+          Quadrant Chart
+        </Button>
       </Stack>
     </Stack>
   );

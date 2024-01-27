@@ -13,11 +13,11 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { DATA_ACTION, DataDispatchContext } from "../../context/DataProvider";
+import { DocumentContext } from "../../context/DocumentProdiver";
 import { BASE } from "../../util/global";
 import DarkModeButton from "../atoms/DarkModeButton";
 import MenuItems from "../moleculars/MenuItems";
 import Footer from "../organisms/Footer";
-import { DocumentContext } from "../../context/DocumentProdiver";
 
 declare global {
   interface Window {
@@ -38,6 +38,7 @@ const crumbTo = {
   view: "VIEW",
   chart: "CHART",
   todos: "TODOS",
+  "quadrant-chart": "QUADRANT CHART",
 };
 
 function Layout() {
@@ -110,13 +111,11 @@ function Layout() {
   function handleWorkerMessage(e: Event) {
     if ("source" in (e as any).data && (e as any).data.source.match(/react/))
       return;
-    // console.log((e as any).data);
     const { type, action, data } = (e as any).data;
     const { title, body, icon, id } = data;
     import.meta.env.DEV && console.log(action);
     if (type === "worker") {
       if (action === "todo/view") {
-        console.log(id);
         dataDispatch({
           type: DATA_ACTION.LOAD,
         });

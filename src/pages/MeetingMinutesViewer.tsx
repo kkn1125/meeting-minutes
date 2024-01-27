@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Chip,
-  Divider,
   List,
   ListItemButton,
   Paper,
@@ -19,10 +18,10 @@ import Minutes, { CONTENT_TYPE } from "../model/minutes";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
 //@ts-ignore
-import { toPng } from "html-to-image";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import { jsPDF } from "jspdf";
 import ImageIcon from "@mui/icons-material/Image";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import { toPng } from "html-to-image";
+import { jsPDF } from "jspdf";
 import { DocumentContext } from "../context/DocumentProdiver";
 
 function MeetingMinutesViewer() {
@@ -219,6 +218,23 @@ function MeetingMinutesViewer() {
         <Stack flex={1} gap={4}>
           {/* title & topic */}
           <Stack gap={3}>
+            <Typography
+              fontWeight={700}
+              variant='h6'
+              sx={{
+                position: "relative",
+                "&::before": {
+                  position: "absolute",
+                  bottom: "calc(100% - 0.1em)",
+                  left: 0,
+                  content: "'hash id'",
+                  textTransform: "uppercase",
+                  color: (theme) => theme.palette.text.disabled,
+                  fontSize: (theme) => theme.typography.pxToRem(12),
+                },
+              }}>
+              {minutes.id}
+            </Typography>
             <Typography
               fontWeight={700}
               variant='h6'

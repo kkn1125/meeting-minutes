@@ -8,6 +8,7 @@ import {
   Pagination,
   Skeleton,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import {
@@ -37,6 +38,7 @@ function Todos() {
     new URLSearchParams(locate.search).entries()
   );
   const [todosList, setTodosList] = useState<Todo[]>(null);
+  const [currentPage, setCurrentPage] = useState(Number(params.page) || 1);
 
   useEffect(() => {
     setTodosList(docuManager.todoManager.findAll());
@@ -44,13 +46,16 @@ function Todos() {
 
   const todosMemoList = useMemo(() => {
     const page = Number(params.page ?? 1);
+    setCurrentPage(page);
     return (todosList || [])
       .sort((a, b) => {
         const bStart = new Timestamp(b.startTime);
         const aStart = new Timestamp(a.startTime);
         const bEnd = new Timestamp(b.endTime);
         const aEnd = new Timestamp(a.endTime);
-        return bEnd.isAfterThan(aEnd)
+        return b.title.localeCompare(a.title)
+          ? 1
+          : bEnd.isAfterThan(aEnd)
           ? 1
           : bStart.isAfterThan(aStart)
           ? 1
@@ -104,6 +109,28 @@ function Todos() {
     navigate(`${BASE}todos/view?id=${id}`);
   }
 
+  function handleSearch(e: ChangeEvent) {
+    const target = e.target as HTMLInputElement;
+    const totalList = docuManager.todoManager.findAll();
+    const searchList =
+      target.value === ""
+        ? totalList
+        : totalList.filter((todo) => {
+            return (
+              todo.id.match(target.value) ||
+              todo.title.match(target.value) ||
+              todo.content.match(target.value)
+            );
+          });
+
+    setTodosList(searchList);
+    const totalPage = Math.ceil(searchList.length / LIMIT);
+    const currentPage = Number(params.page);
+    if (totalPage < currentPage) {
+      handleNavigatePage(null, 1);
+    }
+  }
+
   if (todosList === null) {
     return (
       <List component={Stack} gap={1}>
@@ -125,7 +152,7 @@ function Todos() {
 
   return (
     <Stack>
-      <Stack direction='row'>
+      <Stack direction='row' justifyContent={"space-between"} gap={3}>
         <Button
           component={Link}
           to={BASE + "todos/add"}
@@ -133,6 +160,7 @@ function Todos() {
           color='success'>
           Write
         </Button>
+        <TextField label='Seach' sx={{ flex: 1 }} onChange={handleSearch} />
       </Stack>
       <Divider sx={{ my: 2 }} />
       <List
@@ -164,15 +192,21 @@ function Todos() {
                   md: "row",
                 }}
                 gap={1}
-                justifyContent={"space-between"}
-                alignItems='center'
+                justifyContent='space-between'
+                alignItems={{ xs: "flex-start", md: "center" }}
                 flex={1}>
                 <Stack
-                  direction={{
-                    xs: "column",
-                    md: "row",
+                  direction='row'
+                  justifyContent={{
+                    xs: "center",
+                    md: "inherit",
+                  }}
+                  alignItems={{
+                    xs: "inherit",
+                    md: "center",
                   }}
                   gap={1}>
+                  <Chip size='small' label={id.slice(5, 13)} />
                   <Typography>{title}</Typography>
                 </Stack>
                 <Stack direction='row' gap={1} alignItems='center'>
@@ -200,12 +234,12 @@ function Todos() {
       </List>
       <Stack direction='row' justifyContent={"center"} sx={{ mt: 1, mb: 3 }}>
         <Pagination
-          defaultPage={1}
           count={Math.ceil(todosList.length / LIMIT)}
           shape='rounded'
           showFirstButton
           showLastButton
           onChange={handleNavigatePage}
+          page={currentPage}
         />
       </Stack>
     </Stack>

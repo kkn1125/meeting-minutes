@@ -9,16 +9,17 @@ import {
   Pagination,
   Skeleton,
   Stack,
+  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
 import { ChangeEvent, useContext, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { DataContext } from "../context/DataProvider";
+import { DocumentContext } from "../context/DocumentProdiver";
 import Minutes from "../model/minutes";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
-import { DocumentContext } from "../context/DocumentProdiver";
 
 const LIMIT = 5;
 function MeetingMinutesList() {
@@ -30,9 +31,11 @@ function MeetingMinutesList() {
   const params = Object.fromEntries(
     new URLSearchParams(locate.search).entries()
   );
+  const [currentPage, setCurrentPage] = useState(Number(params.page) || 1);
 
   useEffect(() => {
     const docuList = docuManager.findAll();
+
     setMinutesList(() =>
       docuList.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
     );
@@ -40,6 +43,7 @@ function MeetingMinutesList() {
 
   const minutesMemoList = useMemo(() => {
     const page = Number(params.page ?? 1);
+    setCurrentPage(page);
     return (minutesList || []).slice((page - 1) * LIMIT, page * LIMIT);
   }, [minutesList, params.page]);
 
@@ -49,6 +53,32 @@ function MeetingMinutesList() {
 
   function handleNavigatePage(e: ChangeEvent<unknown>, value: number) {
     navigate(`?page=${value}`);
+  }
+
+  function handleSearch(e: ChangeEvent) {
+    const target = e.target as HTMLInputElement;
+    const totalList = docuManager.findAll();
+    const searchList =
+      target.value === ""
+        ? totalList
+        : totalList.filter((minutes) => {
+            return (
+              minutes.id.match(target.value) ||
+              minutes.title.match(target.value) ||
+              minutes.topic.match(target.value) ||
+              minutes.contents.filter((content) =>
+                content.item.match(target.value)
+              ).length > 0 ||
+              minutes.note.match(target.value)
+            );
+          });
+
+    setMinutesList(searchList);
+    const totalPage = Math.ceil(searchList.length / LIMIT);
+    const currentPage = Number(params.page);
+    if (totalPage < currentPage) {
+      handleNavigatePage(null, 1);
+    }
   }
 
   if (minutesList === null) {
@@ -80,6 +110,7 @@ function MeetingMinutesList() {
           color='success'>
           Write
         </Button>
+        <TextField label='Seach' sx={{ flex: 1 }} onChange={handleSearch} />
       </Stack>
       <Divider sx={{ my: 2 }} />
       <List
@@ -118,7 +149,8 @@ function MeetingMinutesList() {
                   md: "row",
                 }}
                 gap={1}
-                alignItems='center'>
+                alignItems={{ xs: "flex-start", md: "center" }}>
+                <Chip size='small' label={id.slice(0, 8)} />
                 <Tooltip title='분류'>
                   <Box>
                     <Chip label={category} size='small' />
@@ -137,12 +169,12 @@ function MeetingMinutesList() {
       </List>
       <Stack direction='row' justifyContent={"center"} sx={{ mt: 1, mb: 3 }}>
         <Pagination
-          defaultPage={1}
           count={Math.ceil(minutesList.length / LIMIT)}
           shape='rounded'
           showFirstButton
           showLastButton
           onChange={handleNavigatePage}
+          page={currentPage}
         />
       </Stack>
     </Stack>

@@ -1,24 +1,20 @@
-import ClassIcon from "@mui/icons-material/Class";
 import {
   Box,
   Button,
   Chip,
-  Divider,
-  List,
-  ListItemButton,
   Skeleton,
   Stack,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { Fragment, useContext, useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { format } from "../util/features";
-import { BASE } from "../util/global";
-import Todo from "../model/todo";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { DataContext } from "../context/DataProvider";
 import { DocumentContext } from "../context/DocumentProdiver";
+import Todo from "../model/todo";
+import { format } from "../util/features";
+import { BASE } from "../util/global";
 
 function TodoViewer() {
   const theme = useTheme();
@@ -133,6 +129,23 @@ function TodoViewer() {
         <Stack flex={1} gap={4}>
           {/* title & topic */}
           <Stack gap={3}>
+            <Typography
+              fontWeight={700}
+              variant='h6'
+              sx={{
+                position: "relative",
+                "&::before": {
+                  position: "absolute",
+                  bottom: "calc(100% - 0.1em)",
+                  left: 0,
+                  content: "'hash id'",
+                  textTransform: "uppercase",
+                  color: (theme) => theme.palette.text.disabled,
+                  fontSize: (theme) => theme.typography.pxToRem(12),
+                },
+              }}>
+              {todos.id.slice(5)}
+            </Typography>
             <Typography
               fontWeight={700}
               variant='h6'

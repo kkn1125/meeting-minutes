@@ -16,6 +16,7 @@ import * as yup from "yup";
 import ContentListField from "../components/atoms/ContentListField";
 import DateField from "../components/atoms/DateField";
 import TagField from "../components/atoms/TagField";
+import { DocumentContext } from "../context/DocumentProdiver";
 import { Category } from "../model/documentation";
 import Minutes, {
   CONTENT_TYPE,
@@ -24,7 +25,6 @@ import Minutes, {
 } from "../model/minutes";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
-import { DocumentContext } from "../context/DocumentProdiver";
 
 const initialValues: InitialValues = {
   category: undefined,

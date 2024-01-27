@@ -1,22 +1,23 @@
 import { Box } from "@mui/material";
+import { useContext, useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import Layout from "./components/templates/Layout.tsx";
-import Home from "./pages/Home";
-import MeetingMinutes from "./pages/MeetingMinutes.tsx";
-import MeetingMinutesList from "./pages/MeetingMinutesList.tsx";
-import MeetingMinutesViewer from "./pages/MeetingMinutesViewer.tsx";
-import { BASE } from "./util/global.ts";
-import WeeklyChart from "./pages/WeeklyChart.tsx";
-import Download from "./pages/Download.tsx";
-import Todos from "./pages/Todos.tsx";
-import TodoEditor from "./pages/TodoEditor.tsx";
-import TodoViewer from "./pages/TodoViewer.tsx";
-import { useContext, useEffect } from "react";
 import { DocumentContext } from "./context/DocumentProdiver.tsx";
 import {
   MESSAGE_ACTION,
   MessageDispatchContext,
 } from "./context/MessageProvider.tsx";
+import Download from "./pages/Download.tsx";
+import Home from "./pages/Home";
+import MeetingMinutes from "./pages/MeetingMinutes.tsx";
+import MeetingMinutesList from "./pages/MeetingMinutesList.tsx";
+import MeetingMinutesViewer from "./pages/MeetingMinutesViewer.tsx";
+import QuadrantChart from "./pages/QuadrantChart.tsx";
+import TodoEditor from "./pages/TodoEditor.tsx";
+import TodoViewer from "./pages/TodoViewer.tsx";
+import Todos from "./pages/Todos.tsx";
+import WeeklyChart from "./pages/WeeklyChart.tsx";
+import { BASE } from "./util/global.ts";
 
 function App() {
   const docuManager = useContext(DocumentContext);
@@ -51,6 +52,7 @@ function App() {
             <Route path='update' element={<MeetingMinutes />} />
           </Route>
           <Route path='chart' element={<WeeklyChart />} />
+          <Route path='quadrant-chart' element={<QuadrantChart />} />
           <Route path='download' element={<Download />} />
         </Route>
       </Routes>

@@ -1,15 +1,24 @@
-import { Box, Button, Stack, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormGroup,
+  FormHelperText,
+  Slider,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useFormik } from "formik";
-import { MouseEvent, useContext, useEffect } from "react";
+import { MouseEvent, useCallback, useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import DateField from "../components/atoms/DateField";
 import { DocumentContext } from "../context/DocumentProdiver";
+import { MessageContext } from "../context/MessageProvider";
 import Timestamp from "../model/timestamp";
 import Todo, { TodoInitialValues, TodoType } from "../model/todo";
 import { format } from "../util/features";
 import { BASE } from "../util/global";
-import { MessageContext } from "../context/MessageProvider";
 
 const validationSchema = yup.object({
   title: yup
@@ -22,6 +31,7 @@ const validationSchema = yup.object({
     .typeError("문자만 가능합니다."),
   startTime: yup.string().required().typeError("날짜 형식만 가능합니다."),
   endTime: yup.string().required().typeError("날짜 형식만 가능합니다."),
+  important: yup.number().required().typeError("숫자만 가능합니다."),
   // finished: yup.boolean(),
   // keep: yup.boolean(),
   // sequence: yup.number().typeError("숫자만 가능합니다."),
@@ -33,6 +43,7 @@ function TodoEditor() {
     content: "",
     startTime: format(new Date(), "YYYY-MM-ddTHH:mm:ss.SSS"),
     endTime: format(new Date(), "YYYY-MM-ddTHH:mm:ss.SSS"),
+    important: 0,
   };
   const messageManager = useContext(MessageContext);
   const docuManager = useContext(DocumentContext);
@@ -141,6 +152,27 @@ function TodoEditor() {
     formik.setFieldValue(type, now);
   }
 
+  const valueLabelFormat = useCallback((value: number) => {
+    switch (value) {
+      case 3:
+        return "매우 중요";
+      case 2:
+        return "중요";
+      case 1:
+        return "다소 중요";
+      case 0:
+        return "보통";
+      case -1:
+        return "다소 여유";
+      case -2:
+        return "여유";
+      case -3:
+        return "매우 여유";
+      default:
+        return value;
+    }
+  }, []);
+
   return (
     <Box>
       <Stack
@@ -185,6 +217,35 @@ function TodoEditor() {
                 },
               }}
             />
+            <FormGroup>
+              <Stack spacing={1}>
+                <Typography>중요도</Typography>
+                <Slider
+                  name='important'
+                  marks
+                  step={0.1}
+                  max={3}
+                  min={-3}
+                  valueLabelDisplay='auto'
+                  value={formik.values?.important}
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
+                  valueLabelFormat={valueLabelFormat}
+                />
+                {formik.touched.important &&
+                  Boolean(formik.errors.important) && (
+                    <FormHelperText
+                      error
+                      sx={{
+                        position: "absolute",
+                        top: "100%",
+                        left: "1em",
+                      }}>
+                      {formik.errors.important as string}
+                    </FormHelperText>
+                  )}
+              </Stack>
+            </FormGroup>
             <Stack direction='row' alignItems='stretch' gap={1}>
               <DateField name='startTime' formik={formik} label='시작 시작' />
               <Button
