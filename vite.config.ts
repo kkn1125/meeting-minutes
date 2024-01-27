@@ -6,12 +6,9 @@ import dotenv from "dotenv";
 export default defineConfig(({ command, mode }) => {
   const MODE = process.env.NODE_ENV || "production";
   const env = loadEnv(mode, process.cwd(), "");
-  console.log(MODE);
   dotenv.config({
     path: path.join(path.resolve(), ".env"),
   });
-
-  console.log(process.env.VITE_MODE);
 
   const HOST = process.env.HOST;
   const PORT = process.env.PORT || 5000;
