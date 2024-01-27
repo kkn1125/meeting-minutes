@@ -4,22 +4,6 @@ function isMobile() {
   return mobile;
 }
 
-// self.addEventListener("push", function (event) {
-//   if ((event as any).data) {
-//     const data = (event as any).data?.json() ?? {};
-//     // console.log(data);
-//     const options = {
-//       body: data.body,
-//       icon: data.icon,
-//       // 다른 알림 옵션을 추가할 수 있습니다.
-//     };
-
-//     (event as any).waitUntil(
-//       (self as any).registration.showNotification(data.title, options)
-//     );
-//   }
-// });
-
 self.addEventListener("notificationclick", function (e) {
   sendToMain((e as any).notification);
   (e as any).notification.close();
@@ -55,7 +39,7 @@ self.addEventListener("message", function (event) {
           body,
           icon,
           data: { id },
-          tag: Date.now(),
+          tag: String(Date.now()),
         })
         .then(() => {
           // (self as any).registration.getNotifications().then((values) => {

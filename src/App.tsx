@@ -38,6 +38,7 @@ function App() {
       }}>
       <Routes>
         <Route path={BASE} element={<Layout />}>
+          <Route path='index.html' element={<Home />} />
           <Route path='' element={<Home />} />
           <Route path='todos'>
             <Route path='' element={<Todos />} />

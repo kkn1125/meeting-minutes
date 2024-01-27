@@ -10,11 +10,16 @@ import DataProvider from "./context/DataProvider.tsx";
 import { BASE } from "./util/global.ts";
 import MessageProvider from "./context/MessageProvider.tsx";
 
+// const test = "https://fcm.googleapis.com/fcm/send";
+
 const registerServiceWorker = async () => {
   if ("serviceWorker" in navigator) {
     try {
       const registration = await navigator.serviceWorker.register(
-        location.origin + `${BASE}worker.${import.meta.env.DEV ? "ts" : "js"}`,
+        location.origin +
+          `${BASE}worker.${
+            import.meta.env.MODE === "development" ? "ts" : "js"
+          }`,
         {
           scope: BASE,
         }

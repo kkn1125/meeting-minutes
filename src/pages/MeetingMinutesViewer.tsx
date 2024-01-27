@@ -378,25 +378,40 @@ function MeetingMinutesViewer() {
                           content: '"🖼️"',
                         },
                       }}>
-                      <Stack>
-                        <Box
-                          component='img'
-                          src={item}
+                      <Stack
+                        alignItems='center'
+                        sx={{
+                          width: "100%",
+                        }}>
+                        <Stack
+                          flex={1}
                           sx={{
-                            width: "100%",
-                          }}
-                        />
-                        <Typography
-                          align='center'
-                          variant='body2'
-                          sx={{
-                            p: 1,
-                            backgroundColor: (theme) =>
-                              theme.palette.background.paper,
-                            color: (theme) => theme.palette.text.secondary,
+                            maxWidth: {
+                              xs: "100%",
+                              md: "85%",
+                              lg: "80%",
+                              xl: "70%",
+                            },
                           }}>
-                          image
-                        </Typography>
+                          <Box
+                            component='img'
+                            src={item}
+                            sx={{
+                              width: "100%",
+                            }}
+                          />
+                          <Typography
+                            align='center'
+                            variant='body2'
+                            sx={{
+                              p: 1,
+                              backgroundColor: (theme) =>
+                                theme.palette.background.paper,
+                              color: (theme) => theme.palette.text.secondary,
+                            }}>
+                            image
+                          </Typography>
+                        </Stack>
                       </Stack>
                     </Stack>
                   ) : type === CONTENT_TYPE.LINK ? (

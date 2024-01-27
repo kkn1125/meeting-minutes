@@ -102,7 +102,12 @@ function QuadrantChart() {
 
   const ContentBox = () => {
     return (
-      <Box component='pre' className='mermaid' children={content.trim()} />
+      <Box
+        component='pre'
+        className='mermaid'
+        children={content.trim()}
+        sx={{ flex: 1, textAlign: "center" }}
+      />
     );
   };
 
