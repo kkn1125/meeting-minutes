@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 
 export default defineConfig(({ command, mode }) => {
   const MODE = process.env.NODE_ENV || "production";
+  const VITE_MODE = process.env.VITE_MODE || "production";
   const env = loadEnv(mode, process.cwd(), "");
   dotenv.config({
     path: path.join(path.resolve(), ".env"),
@@ -17,13 +18,23 @@ export default defineConfig(({ command, mode }) => {
     define: {
       __APP_ENV__: JSON.stringify(env.APP_ENV),
     },
-    base: MODE === "production" ? "/meeting-minutes/" : "/",
+    base:
+      VITE_MODE === "local"
+        ? "/"
+        : MODE === "production"
+        ? "/meeting-minutes/"
+        : "/",
     server: {
       host: HOST,
       port: +PORT,
     },
     build: {
-      outDir: MODE === "production" ? "dist" : "dist2",
+      outDir:
+        VITE_MODE === "local"
+          ? "dist2"
+          : MODE === "production"
+          ? "dist"
+          : "dist2",
     },
     plugins: [react()],
   };

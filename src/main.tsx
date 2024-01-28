@@ -7,7 +7,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 // import { NextUIProvider } from "@nextui-org/react";
 import DarkModeProvider from "./context/DarkModeProvider.tsx";
 import DataProvider from "./context/DataProvider.tsx";
-import { BASE } from "./util/global.ts";
+import { BASE, VITE_MODE } from "./util/global.ts";
 import MessageProvider from "./context/MessageProvider.tsx";
 
 const registerServiceWorker = async () => {
@@ -36,32 +36,34 @@ const registerServiceWorker = async () => {
   }
 };
 
-Notification.requestPermission().then((result) => {
-  // console.log(result);
-  if (result === "granted") {
-    navigator.serviceWorker.ready.then((registration) => {
-      if (
-        !("minutes-agree" in localStorage) ||
-        localStorage.getItem("minutes-agree") === "false"
-      ) {
-        registration.showNotification("알림", {
-          body: "할 일의 알림 기능이 활성화 되었습니다.",
-          icon: BASE + "favicon/apple-touch-icon.png",
-        });
-        localStorage.setItem("minutes-agree", "true");
+if (VITE_MODE !== "local") {
+  Notification.requestPermission().then((result) => {
+    // console.log(result);
+    if (result === "granted") {
+      navigator.serviceWorker.ready.then((registration) => {
+        if (
+          !("minutes-agree" in localStorage) ||
+          localStorage.getItem("minutes-agree") === "false"
+        ) {
+          registration.showNotification("알림", {
+            body: "할 일의 알림 기능이 활성화 되었습니다.",
+            icon: BASE + "favicon/apple-touch-icon.png",
+          });
+          localStorage.setItem("minutes-agree", "true");
+        }
+      });
+    } else if (result === "denied") {
+      if (!("minutes-agree" in localStorage)) {
+        localStorage.setItem("minutes-agree", "false");
+        alert(
+          "알림 기능이 거부되었있습니다. 활성화하시려면 주소줄 좌측을 설정해주세요."
+        );
+      } else {
+        localStorage.setItem("minutes-agree", "false");
       }
-    });
-  } else if (result === "denied") {
-    if (!("minutes-agree" in localStorage)) {
-      localStorage.setItem("minutes-agree", "false");
-      alert(
-        "알림 기능이 거부되었있습니다. 활성화하시려면 주소줄 좌측을 설정해주세요."
-      );
-    } else {
-      localStorage.setItem("minutes-agree", "false");
     }
-  }
-});
+  });
+}
 
 registerServiceWorker();
 

@@ -26,7 +26,7 @@ function QuadrantChart() {
       const endTime = new Timestamp(todo.endTime);
       const gapTime = endTime.getTime() - startTime.getTime();
       const base = maxTime - minTime;
-      const result = parseFloat((gapTime / base).toFixed(1));
+      const result = parseFloat((gapTime / base || 0).toFixed(1));
       return {
         campaign: todo.id.split("-")[1].slice(0, 10) + ":",
         xy: `[${result > 1 ? 1 : result}, ${(todo.important + 3) / 6}]`,
