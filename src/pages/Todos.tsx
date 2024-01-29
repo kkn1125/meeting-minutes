@@ -57,16 +57,12 @@ function Todos() {
         const aStart = new Timestamp(a.startTime);
         const bEnd = new Timestamp(b.endTime);
         const aEnd = new Timestamp(a.endTime);
-        return b.title.localeCompare(a.title)
+        return bEnd.isAfterThan(aEnd)
           ? 1
-          : bEnd.isAfterThan(aEnd)
+          : !b.started || !a.started
           ? 1
-          : bStart.isAfterThan(aStart)
+          : b.finished || a.finished
           ? 1
-          : b.finished
-          ? -1
-          : a.finished
-          ? -1
           : -1;
       })
       .slice((page - 1) * LIMIT, page * LIMIT);
