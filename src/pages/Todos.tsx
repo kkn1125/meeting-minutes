@@ -31,6 +31,8 @@ import { BASE } from "../util/global";
 
 const LIMIT = 5;
 
+const conditions = [];
+
 function Todos() {
   const data = useContext(DataContext);
   const docuManager = useContext(DocumentContext);
@@ -51,21 +53,22 @@ function Todos() {
   const todosMemoList = useMemo(() => {
     const page = Number(params.page ?? 1);
     setCurrentPage(page);
-    return (todosList || [])
-      .sort((a, b) => {
-        const bStart = new Timestamp(b.startTime);
-        const aStart = new Timestamp(a.startTime);
-        const bEnd = new Timestamp(b.endTime);
-        const aEnd = new Timestamp(a.endTime);
-        return bEnd.isAfterThan(aEnd)
-          ? 1
-          : !b.started || !a.started
-          ? 1
-          : b.finished || a.finished
-          ? 1
-          : -1;
-      })
-      .slice((page - 1) * LIMIT, page * LIMIT);
+
+    addCondition((a: Todo, b: Todo) => {
+      const bEnd = new Timestamp(b.endTime);
+      const aEnd = new Timestamp(a.endTime);
+      return bEnd.isAfterThan(aEnd) ? 1 : 0;
+    });
+    addCondition((a: Todo, b: Todo) => {
+      const bStart = new Timestamp(b.startTime);
+      const aStart = new Timestamp(a.startTime);
+      return bStart.isAfterThan(aStart) ? 1 : -1;
+    });
+
+    return multiSort(todosList || [], conditions).slice(
+      (page - 1) * LIMIT,
+      page * LIMIT
+    );
   }, [todosList, params.page]);
 
   const status = useCallback(
@@ -100,6 +103,21 @@ function Todos() {
     },
     [todosList]
   );
+
+  function multiSort(array: Todo[], sortConditions) {
+    return array.sort((a: Todo, b: Todo) => {
+      for (let i = 0; i < sortConditions.length; i++) {
+        const condition = sortConditions[i];
+        const comparison = condition(a, b);
+
+        if (comparison !== 0) return comparison;
+      }
+      return 0;
+    });
+  }
+  function addCondition(condition) {
+    conditions.push(condition);
+  }
 
   function handleNavigatePage(e: ChangeEvent<unknown>, value: number) {
     navigate(`?page=${value}`);
