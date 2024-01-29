@@ -14,7 +14,7 @@ function createWindow() {
   const startUrl =
     process.env.ELECTRON_START_URL ||
     url.format({
-      pathname: path.join(path.resolve(), "dist2/index.html"),
+      pathname: path.join(path.resolve(), "/../../dist2/index.html"),
       protocol: "file:",
       slashes: true,
     });

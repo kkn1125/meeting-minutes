@@ -13,22 +13,44 @@ import MessageProvider from "./context/MessageProvider.tsx";
 const registerServiceWorker = async () => {
   if ("serviceWorker" in navigator) {
     try {
-      const registration = await navigator.serviceWorker.register(
-        location.origin +
-          `${BASE}worker.${
-            import.meta.env.MODE === "development" ? "ts" : "js"
-          }`,
-        {
-          scope: BASE,
+      if (location.origin.match(/file/)) {
+        const registration = await navigator.serviceWorker.register(
+          import.meta.resolve(
+            `${BASE}worker.${
+              import.meta.env.MODE === "development" ? "ts" : "js"
+            }`
+          ),
+          {
+            scope: BASE,
+          }
+        );
+        import.meta.env.DEV && console.log("Service worker updated");
+        if (registration.installing) {
+          console.log("Service worker installing");
+        } else if (registration.waiting) {
+          console.log("Service worker installed");
+        } else if (registration.active) {
+          console.log("Service worker active");
         }
-      );
-      import.meta.env.DEV && console.log("Service worker updated");
-      if (registration.installing) {
-        console.log("Service worker installing");
-      } else if (registration.waiting) {
-        console.log("Service worker installed");
-      } else if (registration.active) {
-        console.log("Service worker active");
+      } else {
+        const registration = await navigator.serviceWorker.register(
+          import.meta.resolve(
+            `${BASE}worker.${
+              import.meta.env.MODE === "development" ? "ts" : "js"
+            }`
+          ),
+          {
+            scope: BASE,
+          }
+        );
+        import.meta.env.DEV && console.log("Service worker updated");
+        if (registration.installing) {
+          console.log("Service worker installing");
+        } else if (registration.waiting) {
+          console.log("Service worker installed");
+        } else if (registration.active) {
+          console.log("Service worker active");
+        }
       }
     } catch (error) {
       console.error(`Registration failed with ${error}`);
@@ -36,7 +58,8 @@ const registerServiceWorker = async () => {
   }
 };
 
-if (VITE_MODE !== "local") {
+// if (VITE_MODE !== "local") {
+try {
   Notification.requestPermission().then((result) => {
     // console.log(result);
     if (result === "granted") {
@@ -63,7 +86,10 @@ if (VITE_MODE !== "local") {
       }
     }
   });
+} catch (error) {
+  //
 }
+// }
 
 registerServiceWorker();
 

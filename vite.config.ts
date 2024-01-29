@@ -20,10 +20,10 @@ export default defineConfig(({ command, mode }) => {
     },
     base:
       VITE_MODE === "local"
-        ? "/"
+        ? "./"
         : MODE === "production"
         ? "/meeting-minutes/"
-        : "/",
+        : "./",
     server: {
       host: HOST,
       port: +PORT,
